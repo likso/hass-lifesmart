@@ -293,17 +293,28 @@ class LifeSmartLight(LifeSmartDevice, LightEntity):
             if self.color_mode == ColorMode.RGBW:
                 if ATTR_RGBW_COLOR in kwargs:
                     self._rgbw_color = kwargs[ATTR_RGBW_COLOR]
-                # convert rgbw to wrgb tuple
-                rgbhex = (self._rgbw_color[-1],) + self._rgbw_color[:-1]
-                rgbhex = binascii.hexlify(struct.pack("BBBB", *rgbhex)).decode("ASCII")
-                rgbhex = int(rgbhex, 16)
+                    # convert rgbw to wrgb tuple
+                    rgbhex = (self._rgbw_color[-1],) + self._rgbw_color[:-1]
+                    rgbhex = binascii.hexlify(struct.pack("BBBB", *rgbhex)).decode(
+                        "ASCII"
+                    )
+                    rgbhex = int(rgbhex, 16)
 
-                if (
-                    await super().async_lifesmart_epset(self, "0xff", rgbhex, self._idx)
-                    == 0
-                ):
-                    self._state = True
-                    self.async_schedule_update_ha_state()
+                    if (
+                        await super().async_lifesmart_epset(
+                            self, "0xff", rgbhex, self._idx
+                        )
+                        == 0
+                    ):
+                        self._state = True
+                        self.async_schedule_update_ha_state()
+                else:
+                    if (
+                        await super().async_lifesmart_epset(self, "0x81", 1, self._idx)
+                        == 0
+                    ):
+                        self._state = True
+                        self.async_schedule_update_ha_state()
 
     async def async_turn_off(self, **kwargs):
         """Turn the light off."""
@@ -311,7 +322,7 @@ class LifeSmartLight(LifeSmartDevice, LightEntity):
             if await super().async_lifesmart_epset(self, "0x80", 0, "P1") == 0:
                 self._state = False
                 self.async_schedule_update_ha_state()
-        
+
         elif self._devtype in SPOT_TYPES:
             if ATTR_RGBW_COLOR in kwargs:
                 self._rgbw_color = kwargs[ATTR_RGBW_COLOR]
@@ -329,7 +340,7 @@ class LifeSmartLight(LifeSmartDevice, LightEntity):
             else:
                 if await super().async_lifesmart_epset(self, "0x80", 0, self._idx) == 0:
                     self._state = False
-                    self.async_schedule_update_ha_state()                    
+                    self.async_schedule_update_ha_state()
 
         else:
             if await super().async_lifesmart_epset(self, "0x80", 0, self._idx) == 0:
