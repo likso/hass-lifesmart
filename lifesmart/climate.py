@@ -24,29 +24,32 @@ from homeassistant.const import (
 )
 
 from . import LifeSmartDevice
+
 _LOGGER = logging.getLogger(__name__)
 DEVICE_TYPE = "climate"
 
-LIFESMART_STATE_LIST = [HVAC_MODE_OFF,
-HVAC_MODE_AUTO,
-HVAC_MODE_FAN_ONLY,
-HVAC_MODE_COOL,
-HVAC_MODE_HEAT,
-HVAC_MODE_DRY]
+LIFESMART_STATE_LIST = [
+    HVAC_MODE_OFF,
+    HVAC_MODE_AUTO,
+    HVAC_MODE_FAN_ONLY,
+    HVAC_MODE_COOL,
+    HVAC_MODE_HEAT,
+    HVAC_MODE_DRY,
+]
 
-LIFESMART_STATE_LIST2 = [HVAC_MODE_OFF,
-HVAC_MODE_HEAT]
+LIFESMART_STATE_LIST2 = [HVAC_MODE_OFF, HVAC_MODE_HEAT]
 
 FAN_MODES = [FAN_LOW, FAN_MEDIUM, FAN_HIGH]
-GET_FAN_SPEED = { FAN_LOW:15, FAN_MEDIUM:45, FAN_HIGH:76 }
+GET_FAN_SPEED = {FAN_LOW: 15, FAN_MEDIUM: 45, FAN_HIGH: 76}
 
-AIR_TYPES=["V_AIR_P"]
+AIR_TYPES = ["V_AIR_P"]
 
 THER_TYPES = ["SL_CP_DN"]
 
 LIFESMART_STATE_LIST
 
-def setup_platform(hass, config, add_entities, discovery_info=None):
+
+async def async_setup_platform(hass, config, async_add_entities, discovery_info=None):
     """Set up LifeSmart Climate devices."""
     if discovery_info is None:
         return
@@ -54,10 +57,11 @@ def setup_platform(hass, config, add_entities, discovery_info=None):
     dev = discovery_info.get("dev")
     param = discovery_info.get("param")
     devices = []
-    if "T" not in dev['data'] and "P3" not in dev['data']:
+    if "T" not in dev["data"] and "P3" not in dev["data"]:
         return
-    devices.append(LifeSmartClimateDevice(dev,"idx","0",param))
-    add_entities(devices)
+    devices.append(LifeSmartClimateDevice(dev, "idx", "0", param))
+    async_add_entities(devices)
+
 
 class LifeSmartClimateDevice(LifeSmartDevice, ClimateEntity):
     """LifeSmart climate devices,include air conditioner,heater."""
@@ -65,35 +69,47 @@ class LifeSmartClimateDevice(LifeSmartDevice, ClimateEntity):
     def __init__(self, dev, idx, val, param):
         """Init LifeSmart cover device."""
         super().__init__(dev, idx, val, param)
-        self._name = dev['name']
-        cdata = dev['data']
-        self.entity_id = ENTITY_ID_FORMAT.format(( dev['devtype'] + "_" + dev['agt'] + "_" + dev['me']).lower().replace(":","_").replace("@","_"))
-        if dev['devtype'] in AIR_TYPES:
+        self._name = dev["name"]
+        cdata = dev["data"]
+        self.entity_id = ENTITY_ID_FORMAT.format(
+            (dev["devtype"] + "_" + dev["agt"][:-3] + "_" + dev["me"])
+            .lower()
+            .replace(":", "_")
+            .replace("@", "_")
+        )
+        if dev["devtype"] in AIR_TYPES:
             self._modes = LIFESMART_STATE_LIST
-            if cdata['O']['type'] % 2 == 0:
+            if cdata["O"]["type"] % 2 == 0:
                 self._mode = LIFESMART_STATE_LIST[0]
             else:
-                self._mode = LIFESMART_STATE_LIST[cdata['MODE']['val']]
-            self._attributes.update({"last_mode": LIFESMART_STATE_LIST[cdata['MODE']['val']]})
-            self._current_temperature = cdata['T']['v']
-            self._target_temperature = cdata['tT']['v']
+                self._mode = LIFESMART_STATE_LIST[cdata["MODE"]["val"]]
+            self._attributes.update(
+                {"last_mode": LIFESMART_STATE_LIST[cdata["MODE"]["val"]]}
+            )
+            self._current_temperature = cdata["T"]["v"]
+            self._target_temperature = cdata["tT"]["v"]
             self._min_temp = 10
             self._max_temp = 35
-            self._fanspeed = cdata['F']['val']
+            self._fanspeed = cdata["F"]["val"]
         else:
             self._modes = LIFESMART_STATE_LIST2
-            if cdata['P1']['type'] % 2 == 0:
+            if cdata["P1"]["type"] % 2 == 0:
                 self._mode = LIFESMART_STATE_LIST2[0]
             else:
                 self._mode = LIFESMART_STATE_LIST2[1]
-            if cdata['P2']['type'] % 2 == 0:
-                self._attributes.setdefault('Heating',"false")
+            if cdata["P2"]["type"] % 2 == 0:
+                self._attributes.setdefault("Heating", "false")
             else:
-                self._attributes.setdefault('Heating',"true")
-            self._current_temperature = cdata['P4']['val'] / 10
-            self._target_temperature = cdata['P3']['val'] / 10
+                self._attributes.setdefault("Heating", "true")
+            self._current_temperature = cdata["P4"]["val"] / 10
+            self._target_temperature = cdata["P3"]["val"] / 10
             self._min_temp = 5
             self._max_temp = 35
+
+    @property
+    def unique_id(self):
+        """A unique identifier for this entity."""
+        return self.entity_id
 
     @property
     def precision(self):
@@ -138,7 +154,7 @@ class LifeSmartClimateDevice(LifeSmartDevice, ClimateEntity):
             fanmode = FAN_LOW
         elif self._fanspeed < 65 and self._fanspeed >= 30:
             fanmode = FAN_MEDIUM
-        elif self._fanspeed >=65:
+        elif self._fanspeed >= 65:
             fanmode = FAN_HIGH
         return fanmode
 
@@ -147,44 +163,44 @@ class LifeSmartClimateDevice(LifeSmartDevice, ClimateEntity):
         """Return the list of available fan modes."""
         return FAN_MODES
 
-    def set_temperature(self, **kwargs):
+    async def async_set_temperature(self, **kwargs):
         """Set new target temperature."""
-        new_temp = int(kwargs['temperature']*10)
-        _LOGGER.info("set_temperature: %s",str(new_temp))
+        new_temp = int(kwargs["temperature"] * 10)
+        _LOGGER.info("set_temperature: %s", str(new_temp))
         if self._devtype in AIR_TYPES:
-            super()._lifesmart_epset(self, "0x88", new_temp, "tT")
+            await super().async_lifesmart_epset(self, "0x88", new_temp, "tT")
         else:
-            super()._lifesmart_epset(self, "0x88", new_temp, "P3")
+            await super().async_lifesmart_epset(self, "0x88", new_temp, "P3")
 
-    def set_fan_mode(self, fan_mode):
+    async def async_set_fan_mode(self, fan_mode):
         """Set new target fan mode."""
-        super()._lifesmart_epset(self, "0xCE", GET_FAN_SPEED[fan_mode], "F")
+        await super().async_lifesmart_epset(self, "0xCE", GET_FAN_SPEED[fan_mode], "F")
 
-    def set_hvac_mode(self, hvac_mode):
+    async def async_set_hvac_mode(self, hvac_mode):
         """Set new target operation mode."""
         if self._devtype in AIR_TYPES:
             if hvac_mode == HVAC_MODE_OFF:
-                super()._lifesmart_epset(self, "0x80", 0, "O")
+                await super().async_lifesmart_epset(self, "0x80", 0, "O")
                 return
             if self._mode == HVAC_MODE_OFF:
-                if super()._lifesmart_epset(self, "0x81", 1, "O") == 0:
+                if await super().async_lifesmart_epset(self, "0x81", 1, "O") == 0:
                     time.sleep(2)
                 else:
                     return
-            super()._lifesmart_epset(self, "0xCE", LIFESMART_STATE_LIST.index(hvac_mode), "MODE")
+            await super().async_lifesmart_epset(
+                self, "0xCE", LIFESMART_STATE_LIST.index(hvac_mode), "MODE"
+            )
         else:
             if hvac_mode == HVAC_MODE_OFF:
-                super()._lifesmart_epset(self, "0x80", 0, "P1")
+                await super().async_lifesmart_epset(self, "0x80", 0, "P1")
                 time.sleep(1)
-                super()._lifesmart_epset(self, "0x80", 0, "P2")
+                await super().async_lifesmart_epset(self, "0x80", 0, "P2")
                 return
             else:
-                if super()._lifesmart_epset(self, "0x81", 1, "P1") == 0:
+                if await super().async_lifesmart_epset(self, "0x81", 1, "P1") == 0:
                     time.sleep(2)
                 else:
                     return
-            
-
 
     @property
     def supported_features(self):
