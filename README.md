@@ -2,6 +2,34 @@
 ==== 
 lifesmart 设备接入 HomeAssistant插件
 
+Updates:
+-------  
+[20220-07-12]
+1. Added async support
+2. Fix entity_id format 
+3. Added unique_id property
+4. Added switch SL_NATURE, SL_SW_NS[1|2|3] support
+5. Added light SL_SPOT colour and brightness support
+6. Added light strip SL_CT_RGBW colour and brightness support
+7. Added light SL_LI_WW colour temperature and brightness support
+8. Fixed Door sensor SL_SC_BG open/closed status
+9. Changed server url to https://api.us.ilifesmart.com/
+10. Added excluded agt setting in configuration.yaml
+
+Added the following into configuration.yaml：
+
+```
+lifesmart:
+  appkey: "your_appkey" 
+  apptoken: "your_apptoken"
+  usertoken: "your_usertoken" 
+  userid: "your_userid"
+  exclude:
+    - "0011" #需屏蔽设备的me值,这个暂时为必填项，可以填任意内容
+  exclude_agt:
+    - "XXXX" #exlucde all devices in these smart stations
+```
+
 更新说明
 -------  
 [2020年12月26日更新]
