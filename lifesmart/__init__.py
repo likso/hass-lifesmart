@@ -391,6 +391,54 @@ def lifesmart_Sendackeys(
     return response
 
 
+def lifesmart_SceneSet(appkey, apptoken, usertoken, userid, agt, id):
+    url = "https://api.us.ilifesmart.com/app/api.SceneSet"
+    tick = int(time.time())
+    # keys = str(keys)
+    sdata = (
+        "method:SceneSet,agt:"
+        + agt
+        + ",id:"
+        + id
+        + ",time:"
+        + str(tick)
+        + ",userid:"
+        + userid
+        + ",usertoken:"
+        + usertoken
+        + ",appkey:"
+        + appkey
+        + ",apptoken:"
+        + apptoken
+    )
+    sign = hashlib.md5(sdata.encode(encoding="UTF-8")).hexdigest()
+    _LOGGER.debug("SceneSet: %s", str(sdata))
+    send_values = {
+        "id": 101,
+        "method": "SceneSet",
+        "params": {
+            "agt": agt,
+            "id": id,
+        },
+        "system": {
+            "ver": "1.0",
+            "lang": "en",
+            "userid": userid,
+            "appkey": appkey,
+            "time": tick,
+            "sign": sign,
+        },
+    }
+    header = {"Content-Type": "application/json"}
+    send_data = json.dumps(send_values)
+    req = urllib.request.Request(
+        url=url, data=send_data.encode("utf-8"), headers=header, method="POST"
+    )
+    response = json.loads(urllib.request.urlopen(req).read().decode("utf-8"))
+    _LOGGER.debug("SceneSet_res: %s", str(response))
+    return response
+
+
 async def async_setup(hass, config):
     """Set up the lifesmart component."""
     param = {}
@@ -498,6 +546,20 @@ async def async_setup(hass, config):
             swing,
         )
         _LOGGER.debug("sendkey: %s", str(restackey))
+
+    def scene_set(call):
+        """Handle the service call."""
+        agt = call.data["agt"]
+        id = call.data["id"]
+        restkey = lifesmart_SceneSet(
+            param["appkey"],
+            param["apptoken"],
+            param["usertoken"],
+            param["userid"],
+            agt,
+            id,
+        )
+        _LOGGER.debug("scene_set: %s", str(restkey))
 
     def get_fan_mode(_fanspeed):
         fanmode = None
@@ -884,6 +946,8 @@ async def async_setup(hass, config):
 
     hass.services.async_register(DOMAIN, "send_keys", send_keys)
     hass.services.async_register(DOMAIN, "send_ackeys", send_ackeys)
+    hass.services.async_register(DOMAIN, "scene_set", scene_set)
+
     ws = websocket.WebSocketApp(
         "wss://api.us.ilifesmart.com:8443/wsapp/",
         on_message=on_message,
