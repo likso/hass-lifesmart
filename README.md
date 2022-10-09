@@ -4,6 +4,31 @@ lifesmart 设备接入 HomeAssistant插件
 
 Updates:
 -------  
+[20220-10-09]
+1. Added scene_set service
+2. Added ai and scene as a switch
+3. Added included AI agt and me setting as a switch setting in configuration.yaml
+
+Added the following into configuration.yaml：
+
+```
+lifesmart:
+  appkey: "your_appkey" 
+  apptoken: "your_apptoken"
+  usertoken: "your_usertoken" 
+  userid: "your_userid"
+  exclude:
+    - "0011" #需屏蔽设备的me值,这个暂时为必填项，可以填任意内容
+  exclude_agt:
+    - "XXXX" #exlucde all devices in these smart stations
+  ai_include_agt:
+    - "XXXXXXXXX" # agt to be included for AI or Scene as a switch, fill any value to omit
+  ai_include_me:
+    - "xxxx" # me to be included for AI or Scene as a switch, fill any value to omit
+  
+```
+
+-------  
 [20220-07-12]
 1. Added async support
 2. Fix entity_id format 
