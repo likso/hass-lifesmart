@@ -4,7 +4,10 @@ lifesmart 设备接入 HomeAssistant插件
 
 Updates:
 -------  
-[20220-10-09]
+[2023-06-08]
+1. 修改耶鲁盖特曼指纹锁开关门 wss 记录，用实际数据来判断是否真正的处于开门或者关门状态
+
+[2022-10-09]
 1. Added scene_set service
 2. Added ai and scene as a switch
 3. Added included AI agt and me setting as a switch setting in configuration.yaml
@@ -113,5 +116,11 @@ lifesmart:
   userid: "your_userid"
   exclude:
     - "0011" #需屏蔽设备的me值,这个暂时为必填项，可以填任意内容
+```
+
+'''
+获取usertoken和username:
+通过iLifeSmart后台小工具拼接appkey,apptoken,回调地址、时间戳、did（可以为空）并在页面里面生成sign来访问用户页面进行授权
+通过回调地址里面得到用户id和usertoken即可按照配置使用
 ```
     
