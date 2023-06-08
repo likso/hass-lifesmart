@@ -117,8 +117,7 @@ lifesmart:
   exclude:
     - "0011" #需屏蔽设备的me值,这个暂时为必填项，可以填任意内容
 ```
-
-'''
+```
 获取usertoken和username:
 通过iLifeSmart后台小工具拼接appkey,apptoken,回调地址、时间戳、did（可以为空）并在页面里面生成sign来访问用户页面进行授权
 通过回调地址里面得到用户id和usertoken即可按照配置使用
