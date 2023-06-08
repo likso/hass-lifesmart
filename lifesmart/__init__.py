@@ -933,9 +933,11 @@ async def async_setup(hass, config):
                     val = msg["msg"]["val"]
                     ulk_way = val >> 12
                     ulk_user = val & 0xFFF
+                    """实际日志获取时，十进制val或者v的返回值，转换为二进制之后，前12bit是解锁方式，后4bit是解锁用户"""
                     ulk_success = True
                     if ulk_user == 0:
                         ulk_success = False
+                        """如果门锁开启后自动关闭会返回一个解锁0的val，此时代表门锁已经关闭"""
                     attrs = {
                         "unlocking_way": ulk_way,
                         "unlocking_user": ulk_user,
@@ -945,10 +947,12 @@ async def async_setup(hass, config):
                             msg["msg"]["ts"] / 1000
                         ).strftime("%Y-%m-%d %H:%M:%S"),
                     }
-                    if msg["msg"]["type"] % 2 == 1:
+                    if msg["msg"]["type"] % 2 == 1 and ulk_success == True:
+                        """加入判断条件，如果解锁的user不是0才是真正使用指纹、卡、密码开锁的"""
                         hass.states.set(enid, "on", attrs)
                     else:
                         hass.states.set(enid, "off", attrs)
+                    """TODO:此处只是添加了一个binary_sensor，但是没有unID,需要再使用设备注册去注册一个门锁"""
             if devtype in OT_SENSOR_TYPES and msg["msg"]["idx"] in [
                 "Z",
                 "V",
