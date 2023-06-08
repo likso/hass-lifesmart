@@ -21,13 +21,13 @@ lifesmart:
   usertoken: "your_usertoken" 
   userid: "your_userid"
   exclude:
-    - "0011" #需屏蔽设备的me值,这个暂时为必填项，可以填任意内容
+    - "0011" #需屏蔽设备的me值,必填项，写9999可以防止屏蔽任何设备
   exclude_agt:
-    - "XXXX" #exlucde all devices in these smart stations
+    - "XXXX" #exlucde all devices in these smart stations,必填项，写9999可以防止屏蔽任何设备
   ai_include_agt:
-    - "XXXXXXXXX" # agt to be included for AI or Scene as a switch, fill any value to omit
+    - "XXXXXXXXX" # agt to be included for AI or Scene as a switch, fill any value to omit,必填项，写9999可以防止屏蔽任何设备
   ai_include_me:
-    - "xxxx" # me to be included for AI or Scene as a switch, fill any value to omit
+    - "xxxx" # me to be included for AI or Scene as a switch, fill any value to omit,必填项，写9999可以防止屏蔽任何设备
   
 ```
 
