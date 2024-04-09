@@ -37,7 +37,6 @@ from homeassistant.components.climate.const import (
     FAN_LOW,
     FAN_MEDIUM,
 )
-from homeassistant.components.fan import SPEED_HIGH, SPEED_LOW, SPEED_MEDIUM
 from homeassistant.core import callback
 from homeassistant.helpers import discovery
 import homeassistant.helpers.config_validation as cv
@@ -144,11 +143,6 @@ LOCK_TYPES = [
     "SL_LK_YL"
 ]
 GUARD_SENSOR_TYPES = ["SL_SC_G", "SL_SC_BG"]
-
-SPEED_OFF = "Speed_Off"
-SPEED_LOW = "Speed_Low"
-SPEED_MEDIUM = "Speed_Medium"
-SPEED_HIGH = "Speed_High"
 
 LIFESMART_STATE_LIST = [HVACMode.OFF,
                         HVACMode.AUTO,
