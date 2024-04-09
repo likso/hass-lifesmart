@@ -11,7 +11,7 @@ Updates:
   * FanSpeed 枚举修改
   * device_state_attributes 改为 extra_state_attributes
   * Climate 类中，统一修改为使用内置属性
-  *
+  * TODO:新增帐号密码认证
 
 [2023-06-08]
 1. 修改耶鲁盖特曼指纹锁开关门 wss 记录，用实际数据来判断是否真正的处于开门或者关门状态
@@ -29,6 +29,8 @@ lifesmart:
   apptoken: "your_apptoken"
   usertoken: "your_usertoken" 
   userid: "your_userid"
+  username: "your_username" 
+  password: "your_password"
   exclude:
     - "0011" #需屏蔽设备的me值,必填项，写9999可以防止屏蔽任何设备
   exclude_agt:

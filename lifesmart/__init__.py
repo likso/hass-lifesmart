@@ -37,6 +37,7 @@ from homeassistant.components.climate.const import (
     FAN_LOW,
     FAN_MEDIUM,
 )
+from homeassistant.components.fan import SPEED_HIGH, SPEED_LOW, SPEED_MEDIUM
 from homeassistant.core import callback
 from homeassistant.helpers import discovery
 import homeassistant.helpers.config_validation as cv
@@ -143,6 +144,11 @@ LOCK_TYPES = [
     "SL_LK_YL"
 ]
 GUARD_SENSOR_TYPES = ["SL_SC_G", "SL_SC_BG"]
+
+SPEED_OFF = "Speed_Off"
+SPEED_LOW = "Speed_Low"
+SPEED_MEDIUM = "Speed_Medium"
+SPEED_HIGH = "Speed_High"
 
 LIFESMART_STATE_LIST = [HVACMode.OFF,
                         HVACMode.AUTO,
@@ -491,6 +497,32 @@ def lifesmart_SceneSet(appkey, apptoken, usertoken, userid, agt, id):
     _LOGGER.debug("SceneSet_res: %s", str(response))
     return response
 
+
+def lifesmart_Login(uid, pwd, appkey):
+    url = "https://api.us.ilifesmart.com/app/auth.login"
+    login_data = {
+        "uid": uid,
+        "pwd": pwd,
+        "appkey": appkey
+    }
+    header = {'Content-Type': 'application/json'}
+    req = urllib.request.Request(url=url, data=json.dumps(login_data).encode('utf-8'), headers=header, method='POST')
+    response = json.loads(urllib.request.urlopen(req).read().decode('utf-8'))
+    return response
+
+
+def lifesmart_doAuth(userid, token, appkey):
+    url = "https://api.us.ilifesmart.com/app/auth.do_auth"
+    auth_data = {
+        "userid": userid,
+        "token": token,
+        "appkey": appkey,
+        "rgn": "cn"
+    }
+    header = {'Content-Type': 'application/json'}
+    req = urllib.request.Request(url=url, data=json.dumps(auth_data).encode('utf-8'), headers=header, method='POST')
+    response = json.loads(urllib.request.urlopen(req).read().decode('utf-8'))
+    return response
 
 async def async_setup(hass, config):
     """Set up the lifesmart component."""
@@ -859,6 +891,10 @@ async def async_setup(hass, config):
                 _idx = msg["msg"]["idx"]
                 attrs = dict(hass.states.get(enid).attributes)
                 nstat = hass.states.get(enid).state
+                _LOGGER.info("enid: %s", str(enid))
+                _LOGGER.info("_idx: %s", str(_idx))
+                _LOGGER.info("attrs: %s", str(attrs))
+                _LOGGER.info("nstat: %s", str(nstat))
                 if _idx == "O":
                     if msg["msg"]["type"] % 2 == 1:
                         nstat = attrs["last_mode"]
@@ -930,11 +966,11 @@ async def async_setup(hass, config):
                     val = msg["msg"]["val"]
                     ulk_way = val >> 12
                     ulk_user = val & 0xFFF
-                    """实际日志获取时，十进制val或者v的返回值，转换为二进制之后，是这样判断的"""
+                    # 实际日志获取时，十进制val或者v的返回值，转换为二进制之后，是这样判断的
                     ulk_success = True
-                    if ulk_user == 0 or msg['msg']['type'] == 1: """type是1的情况一般都是异常，所以不能算成功解锁"""
+                    if ulk_user == 0 or msg['msg']['type'] == 1:  # type是1的情况一般都是异常，所以不能算成功解锁
                         ulk_success = False
-                        """如果门锁开启后自动关闭会返回一个解锁0的val，此时代表门锁已经关闭"""
+                        # 如果门锁开启后自动关闭会返回一个解锁 0 的val，此时代表门锁已经关闭
                     attrs = {
                         "unlocking_way": ulk_way,
                         "unlocking_user": ulk_user,
@@ -945,11 +981,11 @@ async def async_setup(hass, config):
                         ).strftime("%Y-%m-%d %H:%M:%S"),
                     }
                     if msg["msg"]["type"] % 2 == 1 and ulk_success == True:
-                        """加入判断条件，如果解锁的user不是0才是真正使用指纹、卡、密码开锁的"""
+                        # 加入判断条件，如果解锁的user不是0才是真正使用指纹、卡、密码开锁的
                         hass.states.set(enid, "on", attrs)
                     else:
                         hass.states.set(enid, "off", attrs)
-                    """TODO:此处只是添加了一个binary_sensor，但是没有unID,需要再使用设备注册去注册一个门锁"""
+                    # TODO:此处只是添加了一个binary_sensor，但是没有unID,需要再使用设备注册去注册一个门锁
             if devtype in OT_SENSOR_TYPES and msg["msg"]["idx"] in [
                 "Z",
                 "V",
