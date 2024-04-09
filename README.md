@@ -16,61 +16,6 @@ Updates:
 [2023-06-08]
 1. 修改耶鲁盖特曼指纹锁开关门 wss 记录，用实际数据来判断是否真正的处于开门或者关门状态
 
-[2022-10-09]
-1. Added scene_set service
-2. Added ai and scene as a switch
-3. Added included AI agt and me setting as a switch setting in configuration.yaml
-
-Added the following into configuration.yaml：
-
-```
-lifesmart:
-  appkey: "your_appkey" 
-  apptoken: "your_apptoken"
-  usertoken: "your_usertoken" 
-  userid: "your_userid"
-  username: "your_username" 
-  password: "your_password"
-  exclude:
-    - "0011" #需屏蔽设备的me值,必填项，写9999可以防止屏蔽任何设备
-  exclude_agt:
-    - "XXXX" #exlucde all devices in these smart stations,必填项，写9999可以防止屏蔽任何设备
-  ai_include_agt:
-    - "XXXXXXXXX" # agt to be included for AI or Scene as a switch, fill any value to omit,必填项，写9999可以防止屏蔽任何设备
-  ai_include_me:
-    - "xxxx" # me to be included for AI or Scene as a switch, fill any value to omit,必填项，写9999可以防止屏蔽任何设备
-  
-```
-
--------  
-[20220-07-12]
-1. Added async support
-2. Fix entity_id format 
-3. Added unique_id property
-4. Added switch SL_NATURE, SL_SW_NS[1|2|3] support
-5. Added light SL_SPOT colour and brightness support
-6. Added light strip SL_CT_RGBW colour and brightness support
-7. Added light SL_LI_WW colour temperature and brightness support
-8. Fixed Door sensor SL_SC_BG open/closed status
-9. Changed server url to https://api.us.ilifesmart.com/
-10. Added excluded agt setting in configuration.yaml
-
-Added the following into configuration.yaml：
-
-```
-lifesmart:
-  appkey: "your_appkey" 
-  apptoken: "your_apptoken"
-  usertoken: "your_usertoken" 
-  userid: "your_userid"
-  exclude:
-    - "0011" #需屏蔽设备的me值,这个暂时为必填项，可以填任意内容
-  exclude_agt:
-    - "XXXX" #exlucde all devices in these smart stations
-```
-
-更新说明
--------  
 [2020年12月26日更新]
 
 支持流光开关灯光控制
