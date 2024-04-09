@@ -1,12 +1,12 @@
 {
   "domain": "lifesmart",
   "name": "haas-lifesmart",
-  "documentation": "https://github.com/skyzhishui/custom_components",
+  "documentation": "https://github.com/MapleEve/hass-lifesmart",
   "requirements": [],
   "dependencies": [],
   "codeowners": [
     "@skyzhishui",
     "@MapleEve"
   ],
-  "version": "24.04.01"
+  "version": "24.04.02"
 }

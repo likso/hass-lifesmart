@@ -8,8 +8,6 @@ Updates:
 
 * Home Assitant 新版本适配：
   * XXXDevice 改为 XXXEntity
-  * FanSpeed 枚举修改
-  * device_state_attributes 改为 extra_state_attributes
   * Climate 类中，统一修改为使用内置属性
   * TODO:新增帐号密码认证
 

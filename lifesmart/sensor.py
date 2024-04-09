@@ -5,7 +5,6 @@ import logging
 from homeassistant.const import (
     UnitOfTemperature,
 )
-
 DOMAIN = "sensor"
 ENTITY_ID_FORMAT = DOMAIN + ".{}"
 
@@ -13,31 +12,35 @@ from . import LifeSmartDevice
 
 _LOGGER = logging.getLogger(__name__)
 
-GAS_SENSOR_TYPES = ["SL_SC_WA",
+GAS_SENSOR_TYPES = ["SL_SC_WA ",
                     "SL_SC_CH",
                     "SL_SC_CP",
-                    "ELIQ_EM"
-                    ]
+                    "ELIQ_EM"]
 
 OT_SENSOR_TYPES = ["SL_SC_MHW",
                    "SL_SC_BM",
                    "SL_SC_G",
-                   "SL_SC_BG"
-                   ]
+                   "SL_SC_BG"]
+
+LOCK_TYPES = ["SL_LK_LS",
+              "SL_LK_GTM",
+              "SL_LK_AG",
+              "SL_LK_SG",
+              "SL_LK_YL"]
 
 
-async def async_setup_platform(hass, config, async_add_entities, discovery_info=None):
+def setup_platform(hass, config, add_entities, discovery_info=None):
     """Perform the setup for LifeSmart devices."""
     devices = []
     dev = discovery_info.get("dev")
     param = discovery_info.get("param")
     devices = []
-    for idx in dev["data"]:
-        if dev["devtype"] in OT_SENSOR_TYPES and idx in ["Z", "V", "P3", "P4"]:
-            devices.append(LifeSmartSensor(dev, idx, dev["data"][idx], param))
-        elif dev['devtype'] in GAS_SENSOR_TYPES:
-            devices.append(LifeSmartSensor(dev, idx, dev["data"][idx], param))
-    async_add_entities(devices)
+    for idx in dev['data']:
+        if dev['devtype'] in OT_SENSOR_TYPES and idx in ["Z", "V", "P3", "P4"]:
+            devices.append(LifeSmartSensor(dev, idx, dev['data'][idx], param))
+        else:
+            devices.append(LifeSmartSensor(dev, idx, dev['data'][idx], param))
+    add_entities(devices)
 
 
 class LifeSmartSensor(LifeSmartDevice):
@@ -47,15 +50,12 @@ class LifeSmartSensor(LifeSmartDevice):
         """Initialize the LifeSmartSensor."""
         super().__init__(dev, idx, val, param)
         self.entity_id = ENTITY_ID_FORMAT.format(
-            (
-                dev["devtype"] + "_" + dev["agt"][:-3] + "_" + dev["me"] + "_" + idx
-            ).lower()
-        )
-        devtype = dev["devtype"]
+            (dev['devtype'] + "_" + dev['agt'] + "_" + dev['me'] + "_" + idx).lower())
+        devtype = dev['devtype']
         if devtype in GAS_SENSOR_TYPES:
             self._unit = "None"
             self._device_class = "None"
-            self._state = val["val"]
+            self._state = val['val']
         else:
             if idx == "T" or idx == "P1":
                 self._device_class = "temperature"
@@ -69,6 +69,9 @@ class LifeSmartSensor(LifeSmartDevice):
             elif idx == "V":
                 self._device_class = "battery"
                 self._unit = "%"
+            elif idx == "BAT":
+                self._device_class = "battery"
+                self._unit = "%"
             elif idx == "P3":
                 self._device_class = "None"
                 self._unit = "ppm"
@@ -78,7 +81,8 @@ class LifeSmartSensor(LifeSmartDevice):
             else:
                 self._unit = "None"
                 self._device_class = "None"
-            self._state = val["v"]
+            self._state = val['v']
+
 
     @property
     def unit_of_measurement(self):
@@ -94,8 +98,3 @@ class LifeSmartSensor(LifeSmartDevice):
     def state(self):
         """Return the state of the sensor."""
         return self._state
-
-    @property
-    def unique_id(self):
-        """A unique identifier for this entity."""
-        return self.entity_id
