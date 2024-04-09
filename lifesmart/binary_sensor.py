@@ -1,6 +1,5 @@
 """Support for LifeSmart binary sensors."""
 import logging
-from homeassistant.const import STATE_OFF, STATE_ON
 from homeassistant.components.binary_sensor import (
     BinarySensorDeviceClass,
     BinarySensorEntity,
@@ -66,29 +65,6 @@ class LifeSmartBinarySensor(LifeSmartDevice, BinarySensorEntity):
                 self._state = False
             else:
                 self._state = True
-        elif devtype in LOCK_TYPES:
-            self._device_class = BinarySensorDeviceClass.LOCK
-            # On means open (unlocked), Off means closed (locked)
-            val = val["val"]
-            unlock_method = val >> 12
-            unlock_user = val & 0xFFF
-            is_unlock_success = False
-            if (
-                    idx["type"] % 2 == 1
-                    and unlock_user != 0
-                    and unlock_method != 15
-            ):
-                is_unlock_success = True
-            if is_unlock_success == True:
-                self._state = True
-            else:
-                self._state = False
-            self._attrs = {
-                "unlocking_way": unlock_method,
-                "unlocking_user": unlock_user,
-                "devtype": devtype,
-                "unlocking_success": is_unlock_success,
-            }
         else:
             self._device_class = BinarySensorDeviceClass.LOCK
             # On means open (unlocked), Off means closed (locked)

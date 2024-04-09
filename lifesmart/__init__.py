@@ -1410,13 +1410,10 @@ class LifeSmartStatesManager(threading.Thread):
     def run(self):
         while self._run:
             _LOGGER.debug("Lifesmart: starting wss...")
-            if not self._ws.sock or not self._ws.sock.connected:
-                try:
-                    self._ws.run_forever()
-                except websocket._exceptions.WebSocketException as e:
-                    _LOGGER.error("Lifesmart WebSocket error: %s", str(e))
-            else:
-                _LOGGER.error("Lifesmart WebSocket is already opened")
+            try:
+                self._ws.run_forever()
+            except websocket._exceptions.WebSocketException as e:
+                _LOGGER.error("Lifesmart WebSocket error: %s", str(e))
             _LOGGER.debug("Lifesmart: restart wss...")
             time.sleep(10)
 
