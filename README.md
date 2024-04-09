@@ -1,3 +1,7 @@
+# 注意
+本 repo 已经由更先进的 lifesmart-HACS-for-hass 替代，可以访问 https://github.com/MapleEve/lifesmart-HACS-for-hass 来直接用 HACS 安装
+
+
 使用说明
 ==== 
 lifesmart 设备接入 HomeAssistant插件
