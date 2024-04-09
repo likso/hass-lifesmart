@@ -3,7 +3,7 @@ import logging
 
 
 from homeassistant.const import (
-    TEMP_CELSIUS,
+    UnitOfTemperature,
 )
 
 DOMAIN = "sensor"
@@ -13,9 +13,17 @@ from . import LifeSmartDevice
 
 _LOGGER = logging.getLogger(__name__)
 
-GAS_SENSOR_TYPES = ["SL_SC_WA ", "SL_SC_CH", "SL_SC_CP", "ELIQ_EM"]
+GAS_SENSOR_TYPES = ["SL_SC_WA",
+                    "SL_SC_CH",
+                    "SL_SC_CP",
+                    "ELIQ_EM"
+                    ]
 
-OT_SENSOR_TYPES = ["SL_SC_MHW", "SL_SC_BM", "SL_SC_G", "SL_SC_BG"]
+OT_SENSOR_TYPES = ["SL_SC_MHW",
+                   "SL_SC_BM",
+                   "SL_SC_G",
+                   "SL_SC_BG"
+                   ]
 
 
 async def async_setup_platform(hass, config, async_add_entities, discovery_info=None):
@@ -51,7 +59,7 @@ class LifeSmartSensor(LifeSmartDevice):
         else:
             if idx == "T" or idx == "P1":
                 self._device_class = "temperature"
-                self._unit = TEMP_CELSIUS
+                self._unit = UnitOfTemperature.CELSIUS
             elif idx == "H" or idx == "P2":
                 self._device_class = "humidity"
                 self._unit = "%"

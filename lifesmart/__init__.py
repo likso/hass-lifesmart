@@ -1,4 +1,3 @@
-"""lifesmart by @skyzhishui"""
 import subprocess
 from unittest import case
 import urllib.request
@@ -32,14 +31,8 @@ from homeassistant.const import (
     CONF_FRIENDLY_NAME,
 )
 from homeassistant.components.climate.const import (
-    HVAC_MODE_AUTO,
-    HVAC_MODE_COOL,
-    HVAC_MODE_FAN_ONLY,
-    HVAC_MODE_HEAT,
-    HVAC_MODE_DRY,
-    SUPPORT_FAN_MODE,
-    SUPPORT_TARGET_TEMPERATURE,
-    HVAC_MODE_OFF,
+    ClimateEntityFeature,
+    HVACMode,
     FAN_HIGH,
     FAN_LOW,
     FAN_MEDIUM,
@@ -142,17 +135,21 @@ COVER_TYPES = ["SL_DOOYA"]
 GAS_SENSOR_TYPES = ["SL_SC_WA ", "SL_SC_CH", "SL_SC_CP", "ELIQ_EM"]
 EV_SENSOR_TYPES = ["SL_SC_THL", "SL_SC_BE", "SL_SC_CQ"]
 OT_SENSOR_TYPES = ["SL_SC_MHW", "SL_SC_BM", "SL_SC_G", "SL_SC_BG"]
-LOCK_TYPES = ["SL_LK_LS", "SL_LK_GTM", "SL_LK_AG", "SL_LK_SG", "SL_LK_YL"]
+LOCK_TYPES = [
+    "SL_LK_LS",
+    "SL_LK_GTM",
+    "SL_LK_AG",
+    "SL_LK_SG",
+    "SL_LK_YL"
+]
 GUARD_SENSOR_TYPES = ["SL_SC_G", "SL_SC_BG"]
 
-LIFESMART_STATE_LIST = [
-    HVAC_MODE_OFF,
-    HVAC_MODE_AUTO,
-    HVAC_MODE_FAN_ONLY,
-    HVAC_MODE_COOL,
-    HVAC_MODE_HEAT,
-    HVAC_MODE_DRY,
-]
+LIFESMART_STATE_LIST = [HVACMode.OFF,
+                        HVACMode.AUTO,
+                        HVACMode.FAN_ONLY,
+                        HVACMode.COOL,
+                        HVACMode.HEAT,
+                        HVACMode.DRY]
 
 CLIMATE_TYPES = ["V_AIR_P", "SL_CP_DN"]
 
@@ -867,14 +864,14 @@ async def async_setup(hass, config):
                         nstat = attrs["last_mode"]
                         hass.states.set(enid, nstat, attrs)
                     else:
-                        nstat = HVAC_MODE_OFF
+                        nstat = HVACMode.OFF
                         hass.states.set(enid, nstat, attrs)
                 if _idx == "P1":
                     if msg["msg"]["type"] % 2 == 1:
-                        nstat = HVAC_MODE_HEAT
+                        nstat = HVACMode.HEAT
                         hass.states.set(enid, nstat, attrs)
                     else:
-                        nstat = HVAC_MODE_OFF
+                        nstat = HVACMode.OFF
                         hass.states.set(enid, nstat, attrs)
                 if _idx == "P2":
                     if msg["msg"]["type"] % 2 == 1:
@@ -885,7 +882,7 @@ async def async_setup(hass, config):
                         hass.states.set(enid, nstat, attrs)
                 elif _idx == "MODE":
                     if msg["msg"]["type"] == 206:
-                        if nstat != HVAC_MODE_OFF:
+                        if nstat != HVACMode.OFF:
                             nstat = LIFESMART_STATE_LIST[msg["msg"]["val"]]
                         attrs["last_mode"] = nstat
                         hass.states.set(enid, nstat, attrs)
@@ -1002,7 +999,7 @@ async def async_setup(hass, config):
                 hass.states.set(enid, "off", attrs)
 
     def on_message(ws, message):
-        # _LOGGER.info("websocket_msg: %s",str(message))
+        _LOGGER.info("websocket_msg: %s", str(message))
         msg = json.loads(message)
         if "type" not in msg:
             return
@@ -1079,11 +1076,11 @@ class LifeSmartDevice(Entity):
             "SL_SW_ND2",
             "SL_SW_ND3",
         ]:
-            self._name = dev["name"] + "_" + dev["data"][idx]["name"]
+            self._attr_name = dev["name"] + "_" + dev["data"][idx]["name"]
         elif dev["devtype"] in AI_TYPES or dev["devtype"] in LIGHT_DIMMER_TYPES or dev["devtype"] in LIGHT_SWITCH_TYPES:
-            self._name = dev["name"]
+            self._attr_name = dev["name"]
         else:
-            self._name = dev["name"] + "_" + idx
+            self._attr_name = dev['name'] + "_" + idx
         self._appkey = param["appkey"]
         self._apptoken = param["apptoken"]
         self._usertoken = param["usertoken"]
@@ -1092,28 +1089,13 @@ class LifeSmartDevice(Entity):
         self._me = dev["me"]
         self._idx = idx
         self._devtype = dev["devtype"]
-        attrs = {
-            "agt": self._agt,
-            "me": self._me,
-            "idx": self._idx,
-            "devtype": self._devtype,
-        }
-        self._attributes = attrs
+        self._attr_extra_state_attributes = {"agt": self._agt, "me": self._me, "idx": self._idx,
+                                             "devtype": self._devtype}
 
     @property
     def object_id(self):
         """Return LifeSmart device id."""
         return self.entity_id
-
-    @property
-    def extra_state_attributes(self):
-        """Return the state attributes."""
-        return self._attributes
-
-    @property
-    def name(self):
-        """Return LifeSmart device name."""
-        return self._name
 
     @property
     def assumed_state(self):
@@ -1386,9 +1368,9 @@ class LifeSmartDevice(Entity):
         #     url=url, data=send_data.encode("utf-8"), headers=header, method="POST"
         # )
         # response = json.loads(urllib.request.urlopen(req).read().decode("utf-8"))
+        _LOGGER.info("epset_send: %s", str(send_data))
         response = json.loads(await asyncPOST(url, send_data, header))
-        # _LOGGER.info("sceneset_send: %s", str(send_data))
-        # _LOGGER.info("sceneset_res: %s", str(response))
+        _LOGGER.info("sceneset_res: %s", str(response))
         return response["code"]
 
 

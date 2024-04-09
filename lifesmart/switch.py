@@ -1,4 +1,3 @@
-"""lifesmart switch @skyzhishui"""
 import subprocess
 import urllib.request
 import json

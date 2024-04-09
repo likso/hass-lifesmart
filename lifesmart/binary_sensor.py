@@ -9,10 +9,18 @@ from . import LifeSmartDevice
 
 _LOGGER = logging.getLogger(__name__)
 
-
-GUARD_SENSOR = ["SL_SC_G", "SL_SC_BG"]
-MOTION_SENSOR = ["SL_SC_MHW", "SL_SC_BM", "SL_SC_CM"]
-SMOKE_SENSOR = ["SL_P_A"]
+GUARD_SENSOR = [
+    "SL_SC_G",
+    "SL_SC_BG"
+]
+MOTION_SENSOR = [
+    "SL_SC_MHW",
+    "SL_SC_BM",
+    "SL_SC_CM"
+]
+SMOKE_SENSOR = [
+    "SL_P_A"
+]
 
 
 async def async_setup_platform(hass, config, async_add_entities, discovery_info=None):

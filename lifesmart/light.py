@@ -31,7 +31,11 @@ QUANTUM_TYPES = [
     "OD_WE_QUAN",
 ]
 
-SPOT_TYPES = ["MSL_IRCTL", "OD_WE_IRCTL", "SL_SPOT"]
+SPOT_TYPES = [
+    "MSL_IRCTL",
+    "OD_WE_IRCTL",
+    "SL_SPOT"
+]
 
 LIGHT_DIMMER_TYPES = [
     "SL_LI_WW",

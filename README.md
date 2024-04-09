@@ -3,7 +3,16 @@
 lifesmart 设备接入 HomeAssistant插件
 
 Updates:
--------  
+-------
+[2024年4月9日累计更新]
+
+* Home Assitant 新版本适配：
+  * XXXDevice 改为 XXXEntity
+  * FanSpeed 枚举修改
+  * device_state_attributes 改为 extra_state_attributes
+  * Climate 类中，统一修改为使用内置属性
+  *
+
 [2023-06-08]
 1. 修改耶鲁盖特曼指纹锁开关门 wss 记录，用实际数据来判断是否真正的处于开门或者关门状态
 
