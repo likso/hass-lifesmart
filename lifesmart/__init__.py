@@ -161,7 +161,7 @@ async def asyncPOST(url, data, headers):
 
 
 async def asycn_lifesmart_EpGetAll(appkey, apptoken, usertoken, userid):
-    url = "https://api.us.ilifesmart.com/app/api.EpGetAll"
+    url = "https://api.cn2.ilifesmart.com/app/api.EpGetAll"
     tick = int(time.time())
     sdata = (
         "method:EpGetAll,time:"
@@ -200,7 +200,7 @@ async def asycn_lifesmart_EpGetAll(appkey, apptoken, usertoken, userid):
     return False
 
 async def asycn_lifesmart_SceneGet(appkey, apptoken, usertoken, userid, agt):
-    url = "https://api.us.ilifesmart.com/app/api.SceneGet"
+    url = "https://api.cn2.ilifesmart.com/app/api.SceneGet"
     tick = int(time.time())
     sdata = (
         "method:SceneGet,agt:"
@@ -244,7 +244,7 @@ async def asycn_lifesmart_SceneGet(appkey, apptoken, usertoken, userid, agt):
     return False
 
 def lifesmart_EpGetAll(hass, appkey, apptoken, usertoken, userid):
-    url = "https://api.us.ilifesmart.com/app/api.EpGetAll"
+    url = "https://api.cn2.ilifesmart.com/app/api.EpGetAll"
     tick = int(time.time())
     sdata = (
         "method:EpGetAll,time:"
@@ -288,7 +288,7 @@ def lifesmart_EpGetAll(hass, appkey, apptoken, usertoken, userid):
 def lifesmart_Sendkeys(
     appkey, apptoken, usertoken, userid, agt, ai, me, category, brand, keys
 ):
-    url = "https://api.us.ilifesmart.com/app/irapi.SendKeys"
+    url = "https://api.cn2.ilifesmart.com/app/irapi.SendKeys"
     tick = int(time.time())
     # keys = str(keys)
     sdata = (
@@ -364,7 +364,7 @@ def lifesmart_Sendackeys(
     wind,
     swing,
 ):
-    url = "https://api.us.ilifesmart.com/app/irapi.SendACKeys"
+    url = "https://api.cn2.ilifesmart.com/app/irapi.SendACKeys"
     tick = int(time.time())
     # keys = str(keys)
     sdata = (
@@ -439,7 +439,7 @@ def lifesmart_Sendackeys(
 
 
 def lifesmart_SceneSet(appkey, apptoken, usertoken, userid, agt, id):
-    url = "https://api.us.ilifesmart.com/app/api.SceneSet"
+    url = "https://api.cn2.ilifesmart.com/app/api.SceneSet"
     tick = int(time.time())
     # keys = str(keys)
     sdata = (
@@ -551,6 +551,8 @@ async def async_setup(hass, config):
             param["userid"],
             agt,
         )
+        if isinstance(scenes, bool):
+            continue
         for scene in scenes:
             if scene['id'] in ai_include_items:
                 devtype = "ai"
@@ -999,8 +1001,14 @@ async def async_setup(hass, config):
                 hass.states.set(enid, "off", attrs)
 
     def on_message(ws, message):
-        # _LOGGER.info("websocket_msg: %s",str(message))
-        msg = json.loads(message)
+        if not message:
+            _LOGGER.error("Received empty message")
+            return
+        try:
+            msg = json.loads(message)
+        except json.JSONDecodeError:
+            _LOGGER.error("Failed to decode message: %s", message)
+            return
         if "type" not in msg:
             return
         if msg["type"] != "io":
@@ -1009,6 +1017,8 @@ async def async_setup(hass, config):
 
     def on_error(ws, error):
         _LOGGER.error("websocket_error: %s", str(error))
+        if "SSL: UNEXPECTED_EOF_WHILE_READING" in str(error):
+            _LOGGER.error("Unexpected EOF while reading, check your network connection and SSL library")
 
     def on_close(ws, close_status_code, close_msg):
         _LOGGER.debug(
@@ -1054,7 +1064,7 @@ async def async_setup(hass, config):
     hass.services.async_register(DOMAIN, "scene_set", scene_set)
 
     ws = websocket.WebSocketApp(
-        "wss://api.us.ilifesmart.com:8443/wsapp/",
+        "wss://api.cn2.ilifesmart.com:8443/wsapp/",
         on_message=on_message,
         on_error=on_error,
         on_close=on_close,
@@ -1125,7 +1135,7 @@ class LifeSmartDevice(Entity):
     # @staticmethod
     # def _lifesmart_epset(self, type, val, idx):
     #     # self._tick = int(time.time())
-    #     url = "https://api.us.ilifesmart.com/app/api.EpSet"
+    #     url = "https://api.cn2.ilifesmart.com/app/api.EpSet"
     #     tick = int(time.time())
     #     appkey = self._appkey
     #     apptoken = self._apptoken
@@ -1182,7 +1192,7 @@ class LifeSmartDevice(Entity):
 
     # @staticmethod
     # def _lifesmart_epget(self):
-    #     url = "https://api.us.ilifesmart.com/app/api.EpGet"
+    #     url = "https://api.cn2.ilifesmart.com/app/api.EpGet"
     #     tick = int(time.time())
     #     appkey = self._appkey
     #     apptoken = self._apptoken
@@ -1232,7 +1242,7 @@ class LifeSmartDevice(Entity):
     @staticmethod
     async def async_lifesmart_epset(self, type, val, idx):
         # self._tick = int(time.time())
-        url = "https://api.us.ilifesmart.com/app/api.EpSet"
+        url = "https://api.cn2.ilifesmart.com/app/api.EpSet"
         tick = int(time.time())
         appkey = self._appkey
         apptoken = self._apptoken
@@ -1289,7 +1299,7 @@ class LifeSmartDevice(Entity):
 
     @staticmethod
     async def async_lifesmart_epget(self):
-        url = "https://api.us.ilifesmart.com/app/api.EpGet"
+        url = "https://api.cn2.ilifesmart.com/app/api.EpGet"
         tick = int(time.time())
         appkey = self._appkey
         apptoken = self._apptoken
@@ -1339,7 +1349,7 @@ class LifeSmartDevice(Entity):
     @staticmethod
     async def async_lifesmart_sceneset(self, type, rgbw):
         # self._tick = int(time.time())
-        url = "https://api.us.ilifesmart.com/app/api.SceneSet"
+        url = "https://api.cn2.ilifesmart.com/app/api.SceneSet"
         tick = int(time.time())
         appkey = self._appkey
         apptoken = self._apptoken
@@ -1399,9 +1409,15 @@ class LifeSmartStatesManager(threading.Thread):
 
     def run(self):
         while self._run:
-            _LOGGER.debug("lifesmart: starting wss...")
-            self._ws.run_forever()
-            _LOGGER.debug("lifesmart: restart wss...")
+            _LOGGER.debug("Lifesmart: starting wss...")
+            if not self._ws.sock or not self._ws.sock.connected:
+                try:
+                    self._ws.run_forever()
+                except websocket._exceptions.WebSocketException as e:
+                    _LOGGER.error("Lifesmart WebSocket error: %s", str(e))
+            else:
+                _LOGGER.error("Lifesmart WebSocket is already opened")
+            _LOGGER.debug("Lifesmart: restart wss...")
             time.sleep(10)
 
     def start_keep_alive(self):
