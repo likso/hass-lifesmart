@@ -1,5 +1,5 @@
 send_keys:
-  description: send keys.
+  description: 红外遥控按键发送
   fields:
     me:
       description: 设备me值
@@ -21,7 +21,7 @@ send_keys:
       example: '["key"]'
 
 scene_set:
-  description: Scene Set.
+  description: 场景设置
   fields:
     agt:
       description: 智慧中心agt
