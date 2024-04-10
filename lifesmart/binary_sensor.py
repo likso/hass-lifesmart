@@ -10,7 +10,6 @@ from . import LifeSmartDevice
 
 _LOGGER = logging.getLogger(__name__)
 
-
 GUARD_SENSOR = ["SL_SC_G", "SL_SC_BG"]
 MOTION_SENSOR = ["SL_SC_MHW", "SL_SC_BM", "SL_SC_CM"]
 SMOKE_SENSOR = ["SL_P_A"]
@@ -36,7 +35,7 @@ class LifeSmartBinarySensor(LifeSmartDevice, BinarySensorEntity):
         super().__init__(dev, idx, val, param)
         self.entity_id = ENTITY_ID_FORMAT.format(
             (
-                dev["devtype"] + "_" + dev["agt"][:-3] + "_" + dev["me"] + "_" + idx
+                    dev["devtype"] + "_" + dev["agt"][:-3] + "_" + dev["me"] + "_" + idx
             ).lower()
         )
         devtype = dev["devtype"]

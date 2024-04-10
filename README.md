@@ -1,7 +1,10 @@
 # 注意
-本 repo 已经由更先进的 lifesmart-HACS-for-hass 替代，可以访问 https://github.com/MapleEve/lifesmart-HACS-for-hass 来直接用 HACS 安装
 
-本 repo 的 LTS 支持时间将支持到所有新增变量导入过期。同时由于门锁类型的二元传感器无法注册为设备实体，所以只是“将将能用”，请使用 HACS 插件来完成更复杂的功能
+本 repo 已经由更先进的 lifesmart-HACS-for-hass 替代，可以访问 https://github.com/MapleEve/lifesmart-HACS-for-hass 来直接用
+HACS 安装
+
+本 repo 的 LTS 支持时间将支持到所有新增变量导入过期。同时由于门锁类型的二元传感器无法注册为设备实体，所以只是“将将能用”，请使用
+HACS 插件来完成更复杂的功能
 
 
 使用说明
@@ -18,6 +21,7 @@ Updates:
   * TODO:新增帐号密码认证
 
 [2023-06-08]
+
 1. 修改耶鲁盖特曼指纹锁开关门 wss 记录，用实际数据来判断是否真正的处于开门或者关门状态
 
 [2020年12月26日更新]
@@ -105,6 +109,7 @@ url += "&lang=zh"
 print(url)
 ```
 
-脚本运行之后会打印一个地址，浏览器访问这个地址，用你的 Lifesmart APP 帐号密码登录即可从浏览器跳转到空页面 URI 中获取到 User ID、User Token、Token 过期时间、和优选的 API 域名地址
+脚本运行之后会打印一个地址，浏览器访问这个地址，用你的 Lifesmart APP 帐号密码登录即可从浏览器跳转到空页面 URI 中获取到
+User ID、User Token、Token 过期时间、和优选的 API 域名地址
 
 ## 请注意：每次通过这个方法授权得到的 User Token 有效期为一年，你需要在到期前重新构建方法获取新的 Token

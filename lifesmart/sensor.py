@@ -44,7 +44,7 @@ class LifeSmartSensor(LifeSmartDevice):
         super().__init__(dev, idx, val, param)
         self.entity_id = ENTITY_ID_FORMAT.format(
             (
-                dev["devtype"] + "_" + dev["agt"][:-3] + "_" + dev["me"] + "_" + idx
+                    dev["devtype"] + "_" + dev["agt"][:-3] + "_" + dev["me"] + "_" + idx
             ).lower()
         )
         devtype = dev["devtype"]
