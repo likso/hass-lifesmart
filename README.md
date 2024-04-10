@@ -1,5 +1,6 @@
 # 注意
 本 repo 已经由更先进的 lifesmart-HACS-for-hass 替代，可以访问 https://github.com/MapleEve/lifesmart-HACS-for-hass 来直接用 HACS 安装
+本 repo 的 LTS 支持时间将支持到所有新增变量导入过期。同时由于门锁类型的二元传感器无法注册为设备实体，所以只是“将将能用”，请使用 HACS 插件来完成更复杂的功能
 
 
 使用说明
