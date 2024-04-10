@@ -1,4 +1,3 @@
-"""lifesmart by @skyzhishui"""
 import subprocess
 from unittest import case
 import urllib.request
@@ -32,14 +31,8 @@ from homeassistant.const import (
     CONF_FRIENDLY_NAME,
 )
 from homeassistant.components.climate.const import (
-    HVAC_MODE_AUTO,
-    HVAC_MODE_COOL,
-    HVAC_MODE_FAN_ONLY,
-    HVAC_MODE_HEAT,
-    HVAC_MODE_DRY,
-    SUPPORT_FAN_MODE,
-    SUPPORT_TARGET_TEMPERATURE,
-    HVAC_MODE_OFF,
+    ClimateEntityFeature,
+    HVACMode,
     FAN_HIGH,
     FAN_LOW,
     FAN_MEDIUM,
@@ -65,7 +58,7 @@ CONF_AI_INCLUDE_ITEMS = "ai_include_me"
 CON_AI_TYPE_SCENE = 'scene'
 CON_AI_TYPE_AIB = 'aib'
 CON_AI_TYPE_GROUP = 'grouphw'
-CON_AI_TYPES =[
+CON_AI_TYPES = [
     CON_AI_TYPE_SCENE,
     CON_AI_TYPE_AIB,
     CON_AI_TYPE_GROUP,
@@ -145,14 +138,12 @@ OT_SENSOR_TYPES = ["SL_SC_MHW", "SL_SC_BM", "SL_SC_G", "SL_SC_BG"]
 LOCK_TYPES = ["SL_LK_LS", "SL_LK_GTM", "SL_LK_AG", "SL_LK_SG", "SL_LK_YL"]
 GUARD_SENSOR_TYPES = ["SL_SC_G", "SL_SC_BG"]
 
-LIFESMART_STATE_LIST = [
-    HVAC_MODE_OFF,
-    HVAC_MODE_AUTO,
-    HVAC_MODE_FAN_ONLY,
-    HVAC_MODE_COOL,
-    HVAC_MODE_HEAT,
-    HVAC_MODE_DRY,
-]
+LIFESMART_STATE_LIST = [HVACMode.OFF,
+                        HVACMode.AUTO,
+                        HVACMode.FAN_ONLY,
+                        HVACMode.COOL,
+                        HVACMode.HEAT,
+                        HVACMode.DRY]
 
 CLIMATE_TYPES = ["V_AIR_P", "SL_CP_DN"]
 
@@ -170,19 +161,19 @@ async def asyncPOST(url, data, headers):
 
 
 async def asycn_lifesmart_EpGetAll(appkey, apptoken, usertoken, userid):
-    url = "https://api.us.ilifesmart.com/app/api.EpGetAll"
+    url = "https://api.cn2.ilifesmart.com/app/api.EpGetAll"
     tick = int(time.time())
     sdata = (
-        "method:EpGetAll,time:"
-        + str(tick)
-        + ",userid:"
-        + userid
-        + ",usertoken:"
-        + usertoken
-        + ",appkey:"
-        + appkey
-        + ",apptoken:"
-        + apptoken
+            "method:EpGetAll,time:"
+            + str(tick)
+            + ",userid:"
+            + userid
+            + ",usertoken:"
+            + usertoken
+            + ",appkey:"
+            + appkey
+            + ",apptoken:"
+            + apptoken
     )
     sign = hashlib.md5(sdata.encode(encoding="UTF-8")).hexdigest()
     send_values = {
@@ -208,22 +199,23 @@ async def asycn_lifesmart_EpGetAll(appkey, apptoken, usertoken, userid):
         return response["message"]
     return False
 
+
 async def asycn_lifesmart_SceneGet(appkey, apptoken, usertoken, userid, agt):
-    url = "https://api.us.ilifesmart.com/app/api.SceneGet"
+    url = "https://api.cn2.ilifesmart.com/app/api.SceneGet"
     tick = int(time.time())
     sdata = (
-        "method:SceneGet,agt:"
-        + agt
-        + ",time:"
-        + str(tick)
-        + ",userid:"
-        + userid
-        + ",usertoken:"
-        + usertoken
-        + ",appkey:"
-        + appkey
-        + ",apptoken:"
-        + apptoken
+            "method:SceneGet,agt:"
+            + agt
+            + ",time:"
+            + str(tick)
+            + ",userid:"
+            + userid
+            + ",usertoken:"
+            + usertoken
+            + ",appkey:"
+            + appkey
+            + ",apptoken:"
+            + apptoken
     )
     sign = hashlib.md5(sdata.encode(encoding="UTF-8")).hexdigest()
     send_values = {
@@ -239,7 +231,7 @@ async def asycn_lifesmart_SceneGet(appkey, apptoken, usertoken, userid, agt):
             "appkey": appkey,
             "time": tick,
             "sign": sign,
-        },    
+        },
     }
     header = {"Content-Type": "application/json"}
     send_data = json.dumps(send_values)
@@ -252,20 +244,21 @@ async def asycn_lifesmart_SceneGet(appkey, apptoken, usertoken, userid, agt):
         return response["message"]
     return False
 
+
 def lifesmart_EpGetAll(hass, appkey, apptoken, usertoken, userid):
-    url = "https://api.us.ilifesmart.com/app/api.EpGetAll"
+    url = "https://api.cn2.ilifesmart.com/app/api.EpGetAll"
     tick = int(time.time())
     sdata = (
-        "method:EpGetAll,time:"
-        + str(tick)
-        + ",userid:"
-        + userid
-        + ",usertoken:"
-        + usertoken
-        + ",appkey:"
-        + appkey
-        + ",apptoken:"
-        + apptoken
+            "method:EpGetAll,time:"
+            + str(tick)
+            + ",userid:"
+            + userid
+            + ",usertoken:"
+            + usertoken
+            + ",appkey:"
+            + appkey
+            + ",apptoken:"
+            + apptoken
     )
     sign = hashlib.md5(sdata.encode(encoding="UTF-8")).hexdigest()
     send_values = {
@@ -295,34 +288,34 @@ def lifesmart_EpGetAll(hass, appkey, apptoken, usertoken, userid):
 
 
 def lifesmart_Sendkeys(
-    appkey, apptoken, usertoken, userid, agt, ai, me, category, brand, keys
+        appkey, apptoken, usertoken, userid, agt, ai, me, category, brand, keys
 ):
-    url = "https://api.us.ilifesmart.com/app/irapi.SendKeys"
+    url = "https://api.cn2.ilifesmart.com/app/irapi.SendKeys"
     tick = int(time.time())
     # keys = str(keys)
     sdata = (
-        "method:SendKeys,agt:"
-        + agt
-        + ",ai:"
-        + ai
-        + ",brand:"
-        + brand
-        + ",category:"
-        + category
-        + ",keys:"
-        + keys
-        + ",me:"
-        + me
-        + ",time:"
-        + str(tick)
-        + ",userid:"
-        + userid
-        + ",usertoken:"
-        + usertoken
-        + ",appkey:"
-        + appkey
-        + ",apptoken:"
-        + apptoken
+            "method:SendKeys,agt:"
+            + agt
+            + ",ai:"
+            + ai
+            + ",brand:"
+            + brand
+            + ",category:"
+            + category
+            + ",keys:"
+            + keys
+            + ",me:"
+            + me
+            + ",time:"
+            + str(tick)
+            + ",userid:"
+            + userid
+            + ",usertoken:"
+            + usertoken
+            + ",appkey:"
+            + appkey
+            + ",apptoken:"
+            + apptoken
     )
     sign = hashlib.md5(sdata.encode(encoding="UTF-8")).hexdigest()
     _LOGGER.debug("sendkey: %s", str(sdata))
@@ -357,58 +350,58 @@ def lifesmart_Sendkeys(
 
 
 def lifesmart_Sendackeys(
-    appkey,
-    apptoken,
-    usertoken,
-    userid,
-    agt,
-    ai,
-    me,
-    category,
-    brand,
-    keys,
-    power,
-    mode,
-    temp,
-    wind,
-    swing,
+        appkey,
+        apptoken,
+        usertoken,
+        userid,
+        agt,
+        ai,
+        me,
+        category,
+        brand,
+        keys,
+        power,
+        mode,
+        temp,
+        wind,
+        swing,
 ):
-    url = "https://api.us.ilifesmart.com/app/irapi.SendACKeys"
+    url = "https://api.cn2.ilifesmart.com/app/irapi.SendACKeys"
     tick = int(time.time())
     # keys = str(keys)
     sdata = (
-        "method:SendACKeys,agt:"
-        + agt
-        + ",ai:"
-        + ai
-        + ",brand:"
-        + brand
-        + ",category:"
-        + category
-        + ",keys:"
-        + keys
-        + ",me:"
-        + me
-        + ",mode:"
-        + str(mode)
-        + ",power:"
-        + str(power)
-        + ",swing:"
-        + str(swing)
-        + ",temp:"
-        + str(temp)
-        + ",wind:"
-        + str(wind)
-        + ",time:"
-        + str(tick)
-        + ",userid:"
-        + userid
-        + ",usertoken:"
-        + usertoken
-        + ",appkey:"
-        + appkey
-        + ",apptoken:"
-        + apptoken
+            "method:SendACKeys,agt:"
+            + agt
+            + ",ai:"
+            + ai
+            + ",brand:"
+            + brand
+            + ",category:"
+            + category
+            + ",keys:"
+            + keys
+            + ",me:"
+            + me
+            + ",mode:"
+            + str(mode)
+            + ",power:"
+            + str(power)
+            + ",swing:"
+            + str(swing)
+            + ",temp:"
+            + str(temp)
+            + ",wind:"
+            + str(wind)
+            + ",time:"
+            + str(tick)
+            + ",userid:"
+            + userid
+            + ",usertoken:"
+            + usertoken
+            + ",appkey:"
+            + appkey
+            + ",apptoken:"
+            + apptoken
     )
     sign = hashlib.md5(sdata.encode(encoding="UTF-8")).hexdigest()
     _LOGGER.debug("sendackey: %s", str(sdata))
@@ -448,24 +441,24 @@ def lifesmart_Sendackeys(
 
 
 def lifesmart_SceneSet(appkey, apptoken, usertoken, userid, agt, id):
-    url = "https://api.us.ilifesmart.com/app/api.SceneSet"
+    url = "https://api.cn2.ilifesmart.com/app/api.SceneSet"
     tick = int(time.time())
     # keys = str(keys)
     sdata = (
-        "method:SceneSet,agt:"
-        + agt
-        + ",id:"
-        + id
-        + ",time:"
-        + str(tick)
-        + ",userid:"
-        + userid
-        + ",usertoken:"
-        + usertoken
-        + ",appkey:"
-        + appkey
-        + ",apptoken:"
-        + apptoken
+            "method:SceneSet,agt:"
+            + agt
+            + ",id:"
+            + id
+            + ",time:"
+            + str(tick)
+            + ",userid:"
+            + userid
+            + ",usertoken:"
+            + usertoken
+            + ",appkey:"
+            + appkey
+            + ",apptoken:"
+            + apptoken
     )
     sign = hashlib.md5(sdata.encode(encoding="UTF-8")).hexdigest()
     _LOGGER.debug("SceneSet: %s", str(sdata))
@@ -560,15 +553,16 @@ async def async_setup(hass, config):
             param["userid"],
             agt,
         )
+        if isinstance(scenes, bool):
+            continue
         for scene in scenes:
             if scene['id'] in ai_include_items:
                 devtype = "ai"
                 me = scene['id']
-                dev = { "devtype": devtype, "me": me, "agt": agt }
+                dev = {"devtype": devtype, "me": me, "agt": agt}
                 discovery.load_platform(
                     hass, "switch", DOMAIN, {"dev": {**dev, **scene}, "param": param}, config
                 )
-                
 
     def send_keys(call):
         """Handle the service call."""
@@ -650,9 +644,9 @@ async def async_setup(hass, config):
 
     async def set_Event(msg):
         if (
-            msg["msg"]["idx"] != "s"
-            and msg["msg"]["me"] not in exclude_items
-            and msg["msg"]["agt"] not in exclude_agts
+                msg["msg"]["idx"] != "s"
+                and msg["msg"]["me"] not in exclude_items
+                and msg["msg"]["agt"] not in exclude_agts
         ):
             devtype = msg["msg"]["devtype"]
             # agt = msg['msg']['agt'].replace("_","")
@@ -666,16 +660,16 @@ async def async_setup(hass, config):
                 "P3",
             ]:
                 enid = (
-                    "switch."
-                    + (
-                        devtype
-                        + "_"
-                        + agt
-                        + "_"
-                        + msg["msg"]["me"]
-                        + "_"
-                        + msg["msg"]["idx"]
-                    ).lower()
+                        "switch."
+                        + (
+                                devtype
+                                + "_"
+                                + agt
+                                + "_"
+                                + msg["msg"]["me"]
+                                + "_"
+                                + msg["msg"]["idx"]
+                        ).lower()
                 )
                 attrs = hass.states.get(enid).attributes
                 if msg["msg"]["type"] % 2 == 1:
@@ -690,16 +684,16 @@ async def async_setup(hass, config):
                 "P1",
             ]:
                 enid = (
-                    "binary_sensor."
-                    + (
-                        devtype
-                        + "_"
-                        + agt
-                        + "_"
-                        + msg["msg"]["me"]
-                        + "_"
-                        + msg["msg"]["idx"]
-                    ).lower()
+                        "binary_sensor."
+                        + (
+                                devtype
+                                + "_"
+                                + agt
+                                + "_"
+                                + msg["msg"]["me"]
+                                + "_"
+                                + msg["msg"]["idx"]
+                        ).lower()
                 )
                 attrs = hass.states.get(enid).attributes
                 if devtype in GUARD_SENSOR_TYPES and msg["msg"]["idx"] in ["G"]:
@@ -734,53 +728,53 @@ async def async_setup(hass, config):
                 hass.states.set(enid, nstat, attrs)
             elif devtype in EV_SENSOR_TYPES:
                 enid = (
-                    "sensor."
-                    + (
-                        devtype
-                        + "_"
-                        + agt
-                        + "_"
-                        + msg["msg"]["me"]
-                        + "_"
-                        + msg["msg"]["idx"]
-                    ).lower()
+                        "sensor."
+                        + (
+                                devtype
+                                + "_"
+                                + agt
+                                + "_"
+                                + msg["msg"]["me"]
+                                + "_"
+                                + msg["msg"]["idx"]
+                        ).lower()
                 )
                 attrs = hass.states.get(enid).attributes
                 hass.states.set(enid, msg["msg"]["v"], attrs)
             elif devtype in GAS_SENSOR_TYPES and msg["msg"]["val"] > 0:
                 enid = (
-                    "sensor."
-                    + (
-                        devtype
-                        + "_"
-                        + agt
-                        + "_"
-                        + msg["msg"]["me"]
-                        + "_"
-                        + msg["msg"]["idx"]
-                    ).lower()
+                        "sensor."
+                        + (
+                                devtype
+                                + "_"
+                                + agt
+                                + "_"
+                                + msg["msg"]["me"]
+                                + "_"
+                                + msg["msg"]["idx"]
+                        ).lower()
                 )
                 attrs = hass.states.get(enid).attributes
                 hass.states.set(enid, msg["msg"]["val"], attrs)
             elif devtype in SPOT_TYPES or devtype in LIGHT_SWITCH_TYPES:
                 enid = (
-                    "light."
-                    + (
-                        devtype
-                        + "_"
-                        + agt
-                        + "_"
-                        + msg["msg"]["me"]
-                        + "_"
-                        + msg["msg"]["idx"]
-                    ).lower()
+                        "light."
+                        + (
+                                devtype
+                                + "_"
+                                + agt
+                                + "_"
+                                + msg["msg"]["me"]
+                                + "_"
+                                + msg["msg"]["idx"]
+                        ).lower()
                 )
                 attrs = dict(hass.states.get(enid).attributes)
                 _LOGGER.debug("websocket_light_msg: %s ", str(msg))
                 _LOGGER.debug("websocket_light_attrs: %s", str(attrs))
                 value = msg["msg"]["val"]
                 idx = msg["msg"]["idx"]
-                
+
                 if msg["msg"]["type"] % 2 == 0:
                     hass.states.set(enid, "off", attrs)
                 else:
@@ -819,17 +813,17 @@ async def async_setup(hass, config):
 
             elif devtype in LIGHT_DIMMER_TYPES:
                 enid = (
-                    "light."
-                    + (
-                        devtype
-                        + "_"
-                        + agt
-                        + "_"
-                        + msg["msg"]["me"]
-                        + "_"
-                        + "P1P2"
-                        # + msg["msg"]["idx"]
-                    ).lower()
+                        "light."
+                        + (
+                                devtype
+                                + "_"
+                                + agt
+                                + "_"
+                                + msg["msg"]["me"]
+                                + "_"
+                                + "P1P2"
+                            # + msg["msg"]["idx"]
+                        ).lower()
                 )
                 attrs = dict(hass.states.get(enid).attributes)
                 state = hass.states.get(enid).state
@@ -846,8 +840,8 @@ async def async_setup(hass, config):
                 elif idx in ["P2"]:
                     ratio = 1 - (value / 255)
                     attrs[ATTR_COLOR_TEMP] = (
-                        int((attrs[ATTR_MAX_MIREDS] - attrs[ATTR_MIN_MIREDS]) * ratio)
-                        + attrs[ATTR_MIN_MIREDS]
+                            int((attrs[ATTR_MAX_MIREDS] - attrs[ATTR_MIN_MIREDS]) * ratio)
+                            + attrs[ATTR_MIN_MIREDS]
                     )
                     hass.states.set(enid, state, attrs)
 
@@ -857,7 +851,7 @@ async def async_setup(hass, config):
             #    hass.states.set(enid, msg['msg']['val'], attrs)
             elif devtype in CLIMATE_TYPES:
                 enid = "climate." + (
-                    devtype + "_" + agt + "_" + msg["msg"]["me"]
+                        devtype + "_" + agt + "_" + msg["msg"]["me"]
                 ).lower().replace(":", "_").replace("@", "_")
                 _idx = msg["msg"]["idx"]
                 attrs = dict(hass.states.get(enid).attributes)
@@ -867,14 +861,14 @@ async def async_setup(hass, config):
                         nstat = attrs["last_mode"]
                         hass.states.set(enid, nstat, attrs)
                     else:
-                        nstat = HVAC_MODE_OFF
+                        nstat = HVACMode.OFF
                         hass.states.set(enid, nstat, attrs)
                 if _idx == "P1":
                     if msg["msg"]["type"] % 2 == 1:
-                        nstat = HVAC_MODE_HEAT
+                        nstat = HVACMode.HEAT
                         hass.states.set(enid, nstat, attrs)
                     else:
-                        nstat = HVAC_MODE_OFF
+                        nstat = HVACMode.OFF
                         hass.states.set(enid, nstat, attrs)
                 if _idx == "P2":
                     if msg["msg"]["type"] % 2 == 1:
@@ -885,7 +879,7 @@ async def async_setup(hass, config):
                         hass.states.set(enid, nstat, attrs)
                 elif _idx == "MODE":
                     if msg["msg"]["type"] == 206:
-                        if nstat != HVAC_MODE_OFF:
+                        if nstat != HVACMode.OFF:
                             nstat = LIFESMART_STATE_LIST[msg["msg"]["val"]]
                         attrs["last_mode"] = nstat
                         hass.states.set(enid, nstat, attrs)
@@ -904,38 +898,46 @@ async def async_setup(hass, config):
             elif devtype in LOCK_TYPES:
                 if msg["msg"]["idx"] == "BAT":
                     enid = (
-                        "sensor."
-                        + (
-                            devtype
-                            + "_"
-                            + agt
-                            + "_"
-                            + msg["msg"]["me"]
-                            + "_"
-                            + msg["msg"]["idx"]
-                        ).lower()
+                            "sensor."
+                            + (
+                                    devtype
+                                    + "_"
+                                    + agt
+                                    + "_"
+                                    + msg["msg"]["me"]
+                                    + "_"
+                                    + msg["msg"]["idx"]
+                            ).lower()
                     )
                     attrs = hass.states.get(enid).attributes
                     hass.states.set(enid, msg["msg"]["val"], attrs)
                 elif msg["msg"]["idx"] == "EVTLO":
                     enid = (
-                        "binary_sensor."
-                        + (
-                            devtype
-                            + "_"
-                            + agt
-                            + "_"
-                            + msg["msg"]["me"]
-                            + "_"
-                            + msg["msg"]["idx"]
-                        ).lower()
+                            "binary_sensor."
+                            + (
+                                    devtype
+                                    + "_"
+                                    + agt
+                                    + "_"
+                                    + msg["msg"]["me"]
+                                    + "_"
+                                    + msg["msg"]["idx"]
+                            ).lower()
                     )
                     val = msg["msg"]["val"]
                     ulk_way = val >> 12
                     ulk_user = val & 0xFFF
-                    ulk_success = True
-                    if ulk_user == 0:
-                        ulk_success = False
+                    # 实际日志获取时，十进制val或者v的返回值，转换为二进制之后，是这样判断的
+                    ulk_success = False
+                    if (
+                            msg["msg"]["type"] % 2 == 1
+                            and ulk_user != 0
+                            and ulk_way != 15
+                    ):
+                        # type是1的情况一般都是异常，所以不能算成功解锁
+                        # 如果门锁开启后自动关闭会返回一个解锁0的val，此时代表门锁已经关闭
+                        ulk_success = True
+
                     attrs = {
                         "unlocking_way": ulk_way,
                         "unlocking_user": ulk_user,
@@ -945,10 +947,12 @@ async def async_setup(hass, config):
                             msg["msg"]["ts"] / 1000
                         ).strftime("%Y-%m-%d %H:%M:%S"),
                     }
-                    if msg["msg"]["type"] % 2 == 1:
+                    if ulk_success == True:
+                        # 加入判断条件，如果解锁的user不是0才是真正使用指纹、卡、密码开锁的
                         hass.states.set(enid, "on", attrs)
                     else:
                         hass.states.set(enid, "off", attrs)
+                    # TODO:此处只是添加了一个 binary_sensor，但是没有unID,需要再使用设备注册去注册一个门锁
             if devtype in OT_SENSOR_TYPES and msg["msg"]["idx"] in [
                 "Z",
                 "V",
@@ -956,50 +960,56 @@ async def async_setup(hass, config):
                 "P4",
             ]:
                 enid = (
-                    "sensor."
-                    + (
-                        devtype
-                        + "_"
-                        + agt
-                        + "_"
-                        + msg["msg"]["me"]
-                        + "_"
-                        + msg["msg"]["idx"]
-                    ).lower()
+                        "sensor."
+                        + (
+                                devtype
+                                + "_"
+                                + agt
+                                + "_"
+                                + msg["msg"]["me"]
+                                + "_"
+                                + msg["msg"]["idx"]
+                        ).lower()
                 )
                 attrs = hass.states.get(enid).attributes
                 hass.states.set(enid, msg["msg"]["v"], attrs)
-            
+
         # AI event
         if (msg["msg"]["idx"] == "s"
-            and msg["msg"]["me"] in ai_include_items
-            and msg["msg"]["agt"] in ai_include_agts
-            ):
-            _LOGGER.info("AI Event: %s",str(msg))
+                and msg["msg"]["me"] in ai_include_items
+                and msg["msg"]["agt"] in ai_include_agts
+        ):
+            _LOGGER.info("AI Event: %s", str(msg))
             devtype = msg["msg"]["devtype"]
             agt = msg["msg"]["agt"][:-3]
             enid = (
-               "switch."
-               + (
-                  devtype
-                  + "_"
-                  + agt
-                  + "_"
-                  + msg["msg"]["me"]
-                  + "_"
-                  + msg["msg"]["idx"]
-                ).lower()
+                    "switch."
+                    + (
+                            devtype
+                            + "_"
+                            + agt
+                            + "_"
+                            + msg["msg"]["me"]
+                            + "_"
+                            + msg["msg"]["idx"]
+                    ).lower()
             )
             attrs = hass.states.get(enid).attributes
-           
-            if msg["msg"]["stat"] == 3:                    
+
+            if msg["msg"]["stat"] == 3:
                 hass.states.set(enid, "on", attrs)
             elif msg["msg"]["stat"] == 4:
                 hass.states.set(enid, "off", attrs)
 
     def on_message(ws, message):
-        # _LOGGER.info("websocket_msg: %s",str(message))
-        msg = json.loads(message)
+        if not message:
+            _LOGGER.error("Received empty message")
+            return
+        try:
+            msg = json.loads(message)
+        except json.JSONDecodeError:
+            _LOGGER.error("Failed to decode message: %s", message)
+            return
         if "type" not in msg:
             return
         if msg["type"] != "io":
@@ -1008,6 +1018,8 @@ async def async_setup(hass, config):
 
     def on_error(ws, error):
         _LOGGER.error("websocket_error: %s", str(error))
+        if "SSL: UNEXPECTED_EOF_WHILE_READING" in str(error):
+            _LOGGER.error("Unexpected EOF while reading, check your network connection and SSL library")
 
     def on_close(ws, close_status_code, close_msg):
         _LOGGER.debug(
@@ -1019,16 +1031,16 @@ async def async_setup(hass, config):
     def on_open(ws):
         tick = int(time.time())
         sdata = (
-            "method:WbAuth,time:"
-            + str(tick)
-            + ",userid:"
-            + param["userid"]
-            + ",usertoken:"
-            + param["usertoken"]
-            + ",appkey:"
-            + param["appkey"]
-            + ",apptoken:"
-            + param["apptoken"]
+                "method:WbAuth,time:"
+                + str(tick)
+                + ",userid:"
+                + param["userid"]
+                + ",usertoken:"
+                + param["usertoken"]
+                + ",appkey:"
+                + param["appkey"]
+                + ",apptoken:"
+                + param["apptoken"]
         )
         sign = hashlib.md5(sdata.encode(encoding="UTF-8")).hexdigest()
         send_values = {
@@ -1053,7 +1065,7 @@ async def async_setup(hass, config):
     hass.services.async_register(DOMAIN, "scene_set", scene_set)
 
     ws = websocket.WebSocketApp(
-        "wss://api.us.ilifesmart.com:8443/wsapp/",
+        "wss://api.cn2.ilifesmart.com:8443/wsapp/",
         on_message=on_message,
         on_error=on_error,
         on_close=on_close,
@@ -1124,7 +1136,7 @@ class LifeSmartDevice(Entity):
     # @staticmethod
     # def _lifesmart_epset(self, type, val, idx):
     #     # self._tick = int(time.time())
-    #     url = "https://api.us.ilifesmart.com/app/api.EpSet"
+    #     url = "https://api.cn2.ilifesmart.com/app/api.EpSet"
     #     tick = int(time.time())
     #     appkey = self._appkey
     #     apptoken = self._apptoken
@@ -1181,7 +1193,7 @@ class LifeSmartDevice(Entity):
 
     # @staticmethod
     # def _lifesmart_epget(self):
-    #     url = "https://api.us.ilifesmart.com/app/api.EpGet"
+    #     url = "https://api.cn2.ilifesmart.com/app/api.EpGet"
     #     tick = int(time.time())
     #     appkey = self._appkey
     #     apptoken = self._apptoken
@@ -1231,7 +1243,7 @@ class LifeSmartDevice(Entity):
     @staticmethod
     async def async_lifesmart_epset(self, type, val, idx):
         # self._tick = int(time.time())
-        url = "https://api.us.ilifesmart.com/app/api.EpSet"
+        url = "https://api.cn2.ilifesmart.com/app/api.EpSet"
         tick = int(time.time())
         appkey = self._appkey
         apptoken = self._apptoken
@@ -1240,26 +1252,26 @@ class LifeSmartDevice(Entity):
         agt = self._agt
         me = self._me
         sdata = (
-            "method:EpSet,agt:"
-            + agt
-            + ",idx:"
-            + idx
-            + ",me:"
-            + me
-            + ",type:"
-            + type
-            + ",val:"
-            + str(val)
-            + ",time:"
-            + str(tick)
-            + ",userid:"
-            + userid
-            + ",usertoken:"
-            + usertoken
-            + ",appkey:"
-            + appkey
-            + ",apptoken:"
-            + apptoken
+                "method:EpSet,agt:"
+                + agt
+                + ",idx:"
+                + idx
+                + ",me:"
+                + me
+                + ",type:"
+                + type
+                + ",val:"
+                + str(val)
+                + ",time:"
+                + str(tick)
+                + ",userid:"
+                + userid
+                + ",usertoken:"
+                + usertoken
+                + ",appkey:"
+                + appkey
+                + ",apptoken:"
+                + apptoken
         )
         sign = hashlib.md5(sdata.encode(encoding="UTF-8")).hexdigest()
         send_values = {
@@ -1288,7 +1300,7 @@ class LifeSmartDevice(Entity):
 
     @staticmethod
     async def async_lifesmart_epget(self):
-        url = "https://api.us.ilifesmart.com/app/api.EpGet"
+        url = "https://api.cn2.ilifesmart.com/app/api.EpGet"
         tick = int(time.time())
         appkey = self._appkey
         apptoken = self._apptoken
@@ -1297,20 +1309,20 @@ class LifeSmartDevice(Entity):
         agt = self._agt
         me = self._me
         sdata = (
-            "method:EpGet,agt:"
-            + agt
-            + ",me:"
-            + me
-            + ",time:"
-            + str(tick)
-            + ",userid:"
-            + userid
-            + ",usertoken:"
-            + usertoken
-            + ",appkey:"
-            + appkey
-            + ",apptoken:"
-            + apptoken
+                "method:EpGet,agt:"
+                + agt
+                + ",me:"
+                + me
+                + ",time:"
+                + str(tick)
+                + ",userid:"
+                + userid
+                + ",usertoken:"
+                + usertoken
+                + ",appkey:"
+                + appkey
+                + ",apptoken:"
+                + apptoken
         )
         sign = hashlib.md5(sdata.encode(encoding="UTF-8")).hexdigest()
         send_values = {
@@ -1338,7 +1350,7 @@ class LifeSmartDevice(Entity):
     @staticmethod
     async def async_lifesmart_sceneset(self, type, rgbw):
         # self._tick = int(time.time())
-        url = "https://api.us.ilifesmart.com/app/api.SceneSet"
+        url = "https://api.cn2.ilifesmart.com/app/api.SceneSet"
         tick = int(time.time())
         appkey = self._appkey
         apptoken = self._apptoken
@@ -1347,20 +1359,20 @@ class LifeSmartDevice(Entity):
         agt = self._agt
         id = self._me
         sdata = (
-            "method:SceneSet,agt:"
-            + agt
-            + ",id:"
-            + id
-            + ",time:"
-            + str(tick)
-            + ",userid:"
-            + userid
-            + ",usertoken:"
-            + usertoken
-            + ",appkey:"
-            + appkey
-            + ",apptoken:"
-            + apptoken
+                "method:SceneSet,agt:"
+                + agt
+                + ",id:"
+                + id
+                + ",time:"
+                + str(tick)
+                + ",userid:"
+                + userid
+                + ",usertoken:"
+                + usertoken
+                + ",appkey:"
+                + appkey
+                + ",apptoken:"
+                + apptoken
         )
         sign = hashlib.md5(sdata.encode(encoding="UTF-8")).hexdigest()
         send_values = {
@@ -1398,9 +1410,12 @@ class LifeSmartStatesManager(threading.Thread):
 
     def run(self):
         while self._run:
-            _LOGGER.debug("lifesmart: starting wss...")
-            self._ws.run_forever()
-            _LOGGER.debug("lifesmart: restart wss...")
+            _LOGGER.debug("Lifesmart: starting wss...")
+            try:
+                self._ws.run_forever()
+            except websocket._exceptions.WebSocketException as e:
+                _LOGGER.error("Lifesmart WebSocket error: %s", str(e))
+            _LOGGER.debug("Lifesmart: restart wss...")
             time.sleep(10)
 
     def start_keep_alive(self):

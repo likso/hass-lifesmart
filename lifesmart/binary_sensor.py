@@ -1,6 +1,7 @@
 """Support for LifeSmart binary sensors."""
 import logging
 from homeassistant.components.binary_sensor import (
+    BinarySensorDeviceClass,
     BinarySensorEntity,
     ENTITY_ID_FORMAT,
 )
@@ -8,7 +9,6 @@ from homeassistant.components.binary_sensor import (
 from . import LifeSmartDevice
 
 _LOGGER = logging.getLogger(__name__)
-
 
 GUARD_SENSOR = ["SL_SC_G", "SL_SC_BG"]
 MOTION_SENSOR = ["SL_SC_MHW", "SL_SC_BM", "SL_SC_CM"]
@@ -35,19 +35,19 @@ class LifeSmartBinarySensor(LifeSmartDevice, BinarySensorEntity):
         super().__init__(dev, idx, val, param)
         self.entity_id = ENTITY_ID_FORMAT.format(
             (
-                dev["devtype"] + "_" + dev["agt"][:-3] + "_" + dev["me"] + "_" + idx
+                    dev["devtype"] + "_" + dev["agt"][:-3] + "_" + dev["me"] + "_" + idx
             ).lower()
         )
         devtype = dev["devtype"]
         if devtype in GUARD_SENSOR:
             if idx in ["G"]:
-                self._device_class = "door"
+                self._device_class = BinarySensorDeviceClass.DOOR
                 if val["val"] == 0:
                     self._state = True
                 else:
                     self._state = False
             if idx in ["AXS"]:
-                self._device_class = "vibration"
+                self._device_class = BinarySensorDeviceClass.VIBRATION
                 if val["val"] == 0:
                     self._state = False
                 else:
@@ -59,13 +59,14 @@ class LifeSmartBinarySensor(LifeSmartDevice, BinarySensorEntity):
                 else:
                     self._state = True
         elif devtype in MOTION_SENSOR:
-            self._device_class = "motion"
+            self._device_class = BinarySensorDeviceClass.MOTION
             if val["val"] == 0:
                 self._state = False
             else:
                 self._state = True
         else:
-            self._device_class = "smoke"
+            self._device_class = BinarySensorDeviceClass.LOCK
+            # On means open (unlocked), Off means closed (locked)
             if val["val"] == 0:
                 self._state = False
             else:

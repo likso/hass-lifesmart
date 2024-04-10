@@ -88,7 +88,7 @@ class LifeSmartLight(LifeSmartDevice, LightEntity):
 
         self.entity_id = ENTITY_ID_FORMAT.format(
             (
-                dev["devtype"] + "_" + dev["agt"][:-3] + "_" + dev["me"] + "_" + idx
+                    dev["devtype"] + "_" + dev["agt"][:-3] + "_" + dev["me"] + "_" + idx
             ).lower()
         )
         _LOGGER.info("light: %s added..", str(self.entity_id))
@@ -113,8 +113,8 @@ class LifeSmartLight(LifeSmartDevice, LightEntity):
                     # set color temp
                     ratio = 1 - (val[data_idx]["val"] / 255)
                     self._color_temp = (
-                        int((self._max_mireds - self._min_mireds) * ratio)
-                        + self._min_mireds
+                            int((self._max_mireds - self._min_mireds) * ratio)
+                            + self._min_mireds
                     )
         else:
             # _LOGGER.info("light: param: %s ", str(param))
@@ -239,16 +239,16 @@ class LifeSmartLight(LifeSmartDevice, LightEntity):
         if self._devtype in LIGHT_DIMMER_TYPES:
             if ATTR_BRIGHTNESS in kwargs:
                 if (
-                    await super().async_lifesmart_epset(
-                        self, "0xcf", kwargs[ATTR_BRIGHTNESS], "P1"
-                    )
-                    == 0
+                        await super().async_lifesmart_epset(
+                            self, "0xcf", kwargs[ATTR_BRIGHTNESS], "P1"
+                        )
+                        == 0
                 ):
                     self._brightness = kwargs[ATTR_BRIGHTNESS]
                     self.async_schedule_update_ha_state()
             if ATTR_COLOR_TEMP in kwargs:
                 ratio = (kwargs[ATTR_COLOR_TEMP] - self._min_mireds) / (
-                    self._max_mireds - self._min_mireds
+                        self._max_mireds - self._min_mireds
                 )
                 val = int((-ratio + 1) * 255)
                 if await super().async_lifesmart_epset(self, "0xcf", val, "P2") == 0:
@@ -269,8 +269,8 @@ class LifeSmartLight(LifeSmartDevice, LightEntity):
                 rgbhex = int(rgbhex, 16)
 
                 if (
-                    await super().async_lifesmart_epset(self, "0xff", rgbhex, self._idx)
-                    == 0
+                        await super().async_lifesmart_epset(self, "0xff", rgbhex, self._idx)
+                        == 0
                 ):
                     self._state = True
                     self.async_schedule_update_ha_state()
@@ -284,8 +284,8 @@ class LifeSmartLight(LifeSmartDevice, LightEntity):
                 rgbhex = int(rgbhex, 16)
 
                 if (
-                    await super().async_lifesmart_epset(self, "0xff", rgbhex, self._idx)
-                    == 0
+                        await super().async_lifesmart_epset(self, "0xff", rgbhex, self._idx)
+                        == 0
                 ):
                     self._state = True
                     self.async_schedule_update_ha_state()
@@ -301,17 +301,17 @@ class LifeSmartLight(LifeSmartDevice, LightEntity):
                     rgbhex = int(rgbhex, 16)
 
                     if (
-                        await super().async_lifesmart_epset(
-                            self, "0xff", rgbhex, self._idx
-                        )
-                        == 0
+                            await super().async_lifesmart_epset(
+                                self, "0xff", rgbhex, self._idx
+                            )
+                            == 0
                     ):
                         self._state = True
                         self.async_schedule_update_ha_state()
                 else:
                     if (
-                        await super().async_lifesmart_epset(self, "0x81", 1, self._idx)
-                        == 0
+                            await super().async_lifesmart_epset(self, "0x81", 1, self._idx)
+                            == 0
                     ):
                         self._state = True
                         self.async_schedule_update_ha_state()
@@ -332,8 +332,8 @@ class LifeSmartLight(LifeSmartDevice, LightEntity):
                 rgbhex = int(rgbhex, 16)
 
                 if (
-                    await super().async_lifesmart_epset(self, "0xfe", rgbhex, self._idx)
-                    == 0
+                        await super().async_lifesmart_epset(self, "0xfe", rgbhex, self._idx)
+                        == 0
                 ):
                     self._state = False
                     self.async_schedule_update_ha_state()
@@ -362,18 +362,18 @@ class LifeSmartLight(LifeSmartDevice, LightEntity):
         url = "https://api.us.ilifesmart.com/app/irapi.GetRemoteList"
         tick = int(time.time())
         sdata = (
-            "method:GetRemoteList,agt:"
-            + agt
-            + ",time:"
-            + str(tick)
-            + ",userid:"
-            + userid
-            + ",usertoken:"
-            + usertoken
-            + ",appkey:"
-            + appkey
-            + ",apptoken:"
-            + apptoken
+                "method:GetRemoteList,agt:"
+                + agt
+                + ",time:"
+                + str(tick)
+                + ",userid:"
+                + userid
+                + ",usertoken:"
+                + usertoken
+                + ",appkey:"
+                + appkey
+                + ",apptoken:"
+                + apptoken
         )
         sign = hashlib.md5(sdata.encode(encoding="UTF-8")).hexdigest()
         send_values = {
@@ -408,20 +408,20 @@ class LifeSmartLight(LifeSmartDevice, LightEntity):
         url = "https://api.us.ilifesmart.com/app/irapi.GetRemote"
         tick = int(time.time())
         sdata = (
-            "method:GetRemote,agt:"
-            + agt
-            + ",ai:"
-            + ai
-            + ",needKeys:2,time:"
-            + str(tick)
-            + ",userid:"
-            + userid
-            + ",usertoken:"
-            + usertoken
-            + ",appkey:"
-            + appkey
-            + ",apptoken:"
-            + apptoken
+                "method:GetRemote,agt:"
+                + agt
+                + ",ai:"
+                + ai
+                + ",needKeys:2,time:"
+                + str(tick)
+                + ",userid:"
+                + userid
+                + ",usertoken:"
+                + usertoken
+                + ",appkey:"
+                + appkey
+                + ",apptoken:"
+                + apptoken
         )
         sign = hashlib.md5(sdata.encode(encoding="UTF-8")).hexdigest()
         send_values = {

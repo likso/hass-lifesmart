@@ -1,9 +1,13 @@
 """Support for lifesmart sensors."""
 import logging
 
-
+from homeassistant.components.sensor import SensorDeviceClass
 from homeassistant.const import (
-    TEMP_CELSIUS,
+    PERCENTAGE,
+    UnitOfTemperature,
+    CONCENTRATION_PARTS_PER_MILLION,
+    CONCENTRATION_MILLIGRAMS_PER_CUBIC_METER,
+    LIGHT_LUX,
 )
 
 DOMAIN = "sensor"
@@ -40,7 +44,7 @@ class LifeSmartSensor(LifeSmartDevice):
         super().__init__(dev, idx, val, param)
         self.entity_id = ENTITY_ID_FORMAT.format(
             (
-                dev["devtype"] + "_" + dev["agt"][:-3] + "_" + dev["me"] + "_" + idx
+                    dev["devtype"] + "_" + dev["agt"][:-3] + "_" + dev["me"] + "_" + idx
             ).lower()
         )
         devtype = dev["devtype"]
@@ -50,23 +54,23 @@ class LifeSmartSensor(LifeSmartDevice):
             self._state = val["val"]
         else:
             if idx == "T" or idx == "P1":
-                self._device_class = "temperature"
-                self._unit = TEMP_CELSIUS
+                self._device_class = SensorDeviceClass.TEMPERATURE
+                self._unit = UnitOfTemperature.CELSIUS
             elif idx == "H" or idx == "P2":
-                self._device_class = "humidity"
-                self._unit = "%"
+                self._device_class = SensorDeviceClass.HUMIDITY
+                self._unit = PERCENTAGE
             elif idx == "Z":
-                self._device_class = "illuminance"
-                self._unit = "lx"
+                self._device_class = SensorDeviceClass.ILLUMINANCE
+                self._unit = LIGHT_LUX
             elif idx == "V":
-                self._device_class = "battery"
-                self._unit = "%"
+                self._device_class = SensorDeviceClass.BATTERY
+                self._unit = PERCENTAGE
             elif idx == "P3":
                 self._device_class = "None"
-                self._unit = "ppm"
+                self._unit = CONCENTRATION_PARTS_PER_MILLION
             elif idx == "P4":
                 self._device_class = "None"
-                self._unit = "mg/m3"
+                self._unit = CONCENTRATION_MILLIGRAMS_PER_CUBIC_METER
             else:
                 self._unit = "None"
                 self._device_class = "None"
