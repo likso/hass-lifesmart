@@ -31,15 +31,10 @@ sys.setrecursionlimit(100000)
 from homeassistant.const import (
     CONF_FRIENDLY_NAME,
 )
+
 from homeassistant.components.climate.const import (
-    HVAC_MODE_AUTO,
-    HVAC_MODE_COOL,
-    HVAC_MODE_FAN_ONLY,
-    HVAC_MODE_HEAT,
-    HVAC_MODE_DRY,
-    SUPPORT_FAN_MODE,
-    SUPPORT_TARGET_TEMPERATURE,
-    HVAC_MODE_OFF,
+    ClimateEntityFeature,
+    HVACMode,
     FAN_HIGH,
     FAN_LOW,
     FAN_MEDIUM,
@@ -146,12 +141,12 @@ LOCK_TYPES = ["SL_LK_LS", "SL_LK_GTM", "SL_LK_AG", "SL_LK_SG", "SL_LK_YL"]
 GUARD_SENSOR_TYPES = ["SL_SC_G", "SL_SC_BG"]
 
 LIFESMART_STATE_LIST = [
-    HVAC_MODE_OFF,
-    HVAC_MODE_AUTO,
-    HVAC_MODE_FAN_ONLY,
-    HVAC_MODE_COOL,
-    HVAC_MODE_HEAT,
-    HVAC_MODE_DRY,
+    HVACMode.OFF,
+    HVACMode.AUTO,
+    HVACMode.FAN_ONLY,
+    HVACMode.COOL,
+    HVACMode.HEAT,
+    HVACMode.DRY,
 ]
 
 CLIMATE_TYPES = ["V_AIR_P", "SL_CP_DN"]
@@ -867,14 +862,14 @@ async def async_setup(hass, config):
                         nstat = attrs["last_mode"]
                         hass.states.set(enid, nstat, attrs)
                     else:
-                        nstat = HVAC_MODE_OFF
+                        nstat = HVACMode.OFF
                         hass.states.set(enid, nstat, attrs)
                 if _idx == "P1":
                     if msg["msg"]["type"] % 2 == 1:
-                        nstat = HVAC_MODE_HEAT
+                        nstat = HVACMode.HEAT
                         hass.states.set(enid, nstat, attrs)
                     else:
-                        nstat = HVAC_MODE_OFF
+                        nstat = HVACMode.OFF
                         hass.states.set(enid, nstat, attrs)
                 if _idx == "P2":
                     if msg["msg"]["type"] % 2 == 1:
@@ -885,7 +880,7 @@ async def async_setup(hass, config):
                         hass.states.set(enid, nstat, attrs)
                 elif _idx == "MODE":
                     if msg["msg"]["type"] == 206:
-                        if nstat != HVAC_MODE_OFF:
+                        if nstat != HVACMode.OFF:
                             nstat = LIFESMART_STATE_LIST[msg["msg"]["val"]]
                         attrs["last_mode"] = nstat
                         hass.states.set(enid, nstat, attrs)
