@@ -12,16 +12,6 @@ import websocket
 import asyncio
 import struct
 import aiohttp
-from homeassistant.components.light import (
-    ATTR_BRIGHTNESS,
-    ATTR_COLOR_TEMP,
-    ATTR_HS_COLOR,
-    ATTR_MAX_MIREDS,
-    ATTR_MIN_MIREDS,
-    ATTR_RGB_COLOR,
-    ATTR_RGBW_COLOR,
-)
-import homeassistant.util.color as color_util
 
 import voluptuous as vol
 import sys
@@ -39,6 +29,7 @@ from homeassistant.components.climate.const import (
     FAN_LOW,
     FAN_MEDIUM,
 )
+
 from homeassistant.core import callback
 from homeassistant.helpers import discovery
 import homeassistant.helpers.config_validation as cv

@@ -13,9 +13,9 @@ from homeassistant.components.light import (
     ATTR_HS_COLOR,
     ATTR_RGBW_COLOR,
     ATTR_RGB_COLOR,
-    ATTR_MAX_MIREDS,
-    ATTR_MIN_MIREDS,
-    ATTR_COLOR_TEMP,
+    ATTR_MIN_COLOR_TEMP_KELVIN,
+    ATTR_MAX_COLOR_TEMP_KELVIN,
+    ATTR_COLOR_TEMP_KELVIN,
     # SUPPORT_BRIGHTNESS,
     # SUPPORT_COLOR,
     LightEntity,
@@ -37,8 +37,12 @@ LIGHT_DIMMER_TYPES = [
     "SL_LI_WW",
 ]
 
-MAX_MIREDS = int(1000000 / 2700)
-MIN_MIREDS = int(1000000 / 6500)
+# --- 遵循 HA 最佳实践：直接定义开尔文范围 ---
+DEFAULT_MIN_KELVIN = 2700
+DEFAULT_MAX_KELVIN = 6500
+
+MAX_COLOR_TEMP_KELVIN = DEFAULT_MAX_KELVIN
+MIN_COLOR_TEMP_KELVIN = DEFAULT_MIN_KELVIN
 
 
 async def async_setup_platform(hass, config, async_add_entities, discovery_info=None):
@@ -84,7 +88,7 @@ class LifeSmartLight(LifeSmartDevice, LightEntity):
         """Initialize the LifeSmartLight."""
         super().__init__(dev, idx, val, param)
         self._brightness = None
-        self._color_temp = None
+        self._color_temp_kevin = None
 
         self.entity_id = ENTITY_ID_FORMAT.format(
             (
@@ -98,8 +102,8 @@ class LifeSmartLight(LifeSmartDevice, LightEntity):
         if dev["devtype"] in LIGHT_DIMMER_TYPES:
             self._color_mode = ColorMode.COLOR_TEMP
             self._supported_color_modes = {ColorMode.COLOR_TEMP}
-            self._max_mireds = MAX_MIREDS
-            self._min_mireds = MIN_MIREDS
+            self._max_color_temp_kelvin = MAX_COLOR_TEMP_KELVIN
+            self._min_color_temp_kelvin = MIN_COLOR_TEMP_KELVIN
             for data_idx in val:
                 if data_idx == "P1":
                     # set on/off
@@ -111,10 +115,10 @@ class LifeSmartLight(LifeSmartDevice, LightEntity):
                     self._brightness = val[data_idx]["val"]
                 elif data_idx == "P2":
                     # set color temp
-                    ratio = 1 - (val[data_idx]["val"] / 255)
-                    self._color_temp = (
-                        int((self._max_mireds - self._min_mireds) * ratio)
-                        + self._min_mireds
+                    ratio = val[data_idx]["val"] / 255
+                    self._color_temp_kevin = (
+                        int((self._max_color_temp_kelvin - self._min_color_temp_kelvin) * ratio)
+                        + self._min_color_temp_kelvin
                     )
         else:
             # _LOGGER.info("light: param: %s ", str(param))
@@ -205,19 +209,19 @@ class LifeSmartLight(LifeSmartDevice, LightEntity):
         return self._brightness
 
     @property
-    def color_temp(self):
-        """Return the color_temp value."""
-        return self._color_temp
+    def color_temp_kevin(self):
+        """Return the color_temp_kevin value."""
+        return self._color_temp_kevin
 
     @property
-    def max_mireds(self):
-        """Return the max_mireds value."""
-        return self._max_mireds
+    def max_color_temp_kelvin(self):
+        """Return the max_color_temp_kelvin value."""
+        return self._max_color_temp_kelvin
 
     @property
-    def min_mireds(self):
-        """Return the min_mireds value."""
-        return self._min_mireds
+    def min_color_temp_kelvin(self):
+        """Return the min_color_temp_kelvin value."""
+        return self._min_color_temp_kelvin
 
     # @property
     # def supported_features(self):
@@ -246,13 +250,13 @@ class LifeSmartLight(LifeSmartDevice, LightEntity):
                 ):
                     self._brightness = kwargs[ATTR_BRIGHTNESS]
                     self.async_schedule_update_ha_state()
-            if ATTR_COLOR_TEMP in kwargs:
-                ratio = (kwargs[ATTR_COLOR_TEMP] - self._min_mireds) / (
-                    self._max_mireds - self._min_mireds
+            if ATTR_COLOR_TEMP_KELVIN in kwargs:
+                ratio = (kwargs[ATTR_COLOR_TEMP_KELVIN] - self._min_color_temp_kelvin) / (
+                    self._max_color_temp_kelvin - self._min_color_temp_kelvin
                 )
-                val = int((-ratio + 1) * 255)
+                val = int(ratio  * 255)
                 if await super().async_lifesmart_epset(self, "0xcf", val, "P2") == 0:
-                    self._color_temp = kwargs[ATTR_COLOR_TEMP]
+                    self._color_temp_kevin = kwargs[ATTR_COLOR_TEMP_KELVIN]
                     self.async_schedule_update_ha_state()
             if await super().async_lifesmart_epset(self, "0x81", 1, "P1") == 0:
                 self._state = True
